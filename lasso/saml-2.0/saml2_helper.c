@@ -333,12 +333,15 @@ lasso_saml2_assertion_set_one_time_use(LassoSaml2Assertion *saml2_assertion,
 	g_return_if_fail (LASSO_IS_SAML2_ASSERTION (saml2_assertion));
 
 	saml2_conditions = lasso_saml2_assertion_get_conditions(saml2_assertion, TRUE);
-	lasso_list_add_new_gobject (saml2_conditions->OneTimeUse, lasso_saml2_one_time_use_new());
 	if (one_time_use) {
-		lasso_list_add_new_gobject(saml2_conditions->OneTimeUse,
-				lasso_saml2_one_time_use_new());
+		if (! saml2_conditions->OneTimeUse) {
+			lasso_list_add_new_gobject(saml2_conditions->OneTimeUse,
+					lasso_saml2_one_time_use_new());
+		}
 	} else {
-		lasso_release_list_of_gobjects(saml2_conditions->OneTimeUse);
+		if (saml2_conditions->OneTimeUse) {
+			lasso_release_list_of_gobjects(saml2_conditions->OneTimeUse);
+		}
 	}
 }
 
