@@ -73,7 +73,7 @@ class ServerTestCase(unittest.TestCase):
         dump = lassoServer.dump()
         lassoServer2 = lassoServer.newFromDump(dump)
         dump2 = lassoServer2.dump()
-        self.failUnlessEqual(dump, dump2)
+        self.assertEqual(dump, dump2)
 
     def test02(self):
         """Server construction without argument, dump & newFromDump."""
@@ -87,7 +87,7 @@ class ServerTestCase(unittest.TestCase):
         dump = lassoServer.dump()
         lassoServer2 = lassoServer.newFromDump(dump)
         dump2 = lassoServer2.dump()
-        self.failUnlessEqual(dump, dump2)
+        self.assertEqual(dump, dump2)
 
 
 class LoginTestCase(unittest.TestCase):
@@ -108,7 +108,7 @@ class LoginTestCase(unittest.TestCase):
         login.initAuthnRequest()
         login.request
         login.request.protocolProfile = lasso.LIB_PROTOCOL_PROFILE_BRWS_ART
-        self.failUnlessEqual(login.request.protocolProfile, lasso.LIB_PROTOCOL_PROFILE_BRWS_ART)
+        self.assertEqual(login.request.protocolProfile, lasso.LIB_PROTOCOL_PROFILE_BRWS_ART)
 
     def test02(self):
         """SP login; testing processing of an empty Response."""
@@ -167,10 +167,10 @@ class LoginTestCase(unittest.TestCase):
             os.path.join(dataDir, 'sp1-la/certificate.pem'))
         idpLogin = lasso.Login(idp)
         idpLogin.processAuthnRequestMsg(authnRequestQuery)
-        self.failUnless(idpLogin.request.requestAuthnContext)
+        self.assertTrue(idpLogin.request.requestAuthnContext)
         authnContextClassRefsList = idpLogin.request.requestAuthnContext.authnContextClassRef
-        self.failUnlessEqual(len(authnContextClassRefsList), 1)
-        self.failUnlessEqual(authnContextClassRefsList[0],
+        self.assertEqual(len(authnContextClassRefsList), 1)
+        self.assertEqual(authnContextClassRefsList[0],
                              lasso.LIB_AUTHN_CONTEXT_CLASS_REF_PASSWORD)
 
     def test04(self):
@@ -213,12 +213,12 @@ class LoginTestCase(unittest.TestCase):
             os.path.join(dataDir, 'sp1-la/certificate.pem'))
         idpLogin = lasso.Login(idp)
         idpLogin.processAuthnRequestMsg(authnRequestQuery)
-        self.failUnless(idpLogin.request.extension)
+        self.assertTrue(idpLogin.request.extension)
         extensionsList = idpLogin.request.extension
-        self.failUnlessEqual(len(extensionsList), 1)
-        self.failUnless('<action>do</action>' in extensionsList[0])
-        self.failUnless('<action2>do action 2</action2>' in extensionsList[0])
-        self.failUnless('<action3>do action 3</action3>' in extensionsList[0])
+        self.assertEqual(len(extensionsList), 1)
+        self.assertTrue('<action>do</action>' in extensionsList[0])
+        self.assertTrue('<action2>do action 2</action2>' in extensionsList[0])
+        self.assertTrue('<action3>do action 3</action3>' in extensionsList[0])
 
     def test05(self):
         '''SAMLv2 Authn request emitted and received using Artifact binding'''
@@ -342,7 +342,7 @@ class LogoutTestCase(unittest.TestCase):
             os.path.join(dataDir, 'sp1-la/public-key.pem'),
             os.path.join(dataDir, 'sp1-la/certificate.pem'))
         logout = lasso.Logout(lassoServer)
-        self.failIf(logout.getNextProviderId())
+        self.assertFalse(logout.getNextProviderId())
 
     def test03(self):
         """IDP logout; testing processRequestMsg with non Liberty query."""
@@ -438,7 +438,7 @@ class IdentityTestCase(unittest.TestCase):
         identityDump = """<Identity xmlns="http://www.entrouvert.org/namespaces/lasso/0.0" Version="1"><Federations><Federation xmlns="http://www.entrouvert.org/namespaces/lasso/0.0" Version="1" RemoteProviderID="https://sp1.entrouvert.lan/metadata"><LocalNameIdentifier><saml:NameIdentifier xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" NameQualifier="https://proxy2.entrouvert.lan/metadata" Format="urn:liberty:iff:nameid:federated">_CD739B41C602EAEA93626EBD1751CB46</saml:NameIdentifier></LocalNameIdentifier></Federation><Federation xmlns="http://www.entrouvert.org/namespaces/lasso/0.0" Version="1" RemoteProviderID="https://idp1.entrouvert.lan/metadata"><RemoteNameIdentifier><saml:NameIdentifier xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" NameQualifier="https://idp1.entrouvert.lan/metadata" Format="urn:liberty:iff:nameid:federated">_11EA77A4FED32C41824AC5DE87298E65</saml:NameIdentifier></RemoteNameIdentifier></Federation></Federations></Identity>"""
         identity = lasso.Identity.newFromDump(identityDump)
         newIdentityDump = identity.dump()
-        self.failUnlessEqual(identityDump, newIdentityDump)
+        self.assertEqual(identityDump, newIdentityDump)
 
 class AttributeAuthorityTestCase(unittest.TestCase):
     def test01(self):
