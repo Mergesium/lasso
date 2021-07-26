@@ -1373,7 +1373,7 @@ lasso_saml20_login_process_response_status_and_assertion(LassoLogin *login)
 	char *status_value;
 	lasso_error_t rc = 0;
 	lasso_error_t assertion_signature_status = 0;
-	LassoProfileSignatureVerifyHint verify_hint;
+	LassoProfileSignatureVerifyHint verify_hint = LASSO_PROFILE_SIGNATURE_VERIFY_HINT_LAST;
 
 	profile = &login->parent;
 	lasso_extract_node_or_fail(response, profile->response, SAMLP2_STATUS_RESPONSE,
@@ -1494,19 +1494,6 @@ lasso_saml20_login_process_response_status_and_assertion(LassoLogin *login)
 		lasso_assign_gobject (login->private_data->saml2_assertion, last_assertion);
 	}
 
-	switch (verify_hint) {
-		case LASSO_PROFILE_SIGNATURE_VERIFY_HINT_FORCE:
-		case LASSO_PROFILE_SIGNATURE_VERIFY_HINT_MAYBE:
-			break;
-		case LASSO_PROFILE_SIGNATURE_VERIFY_HINT_IGNORE:
-			/* ignore signature errors */
-			if (rc == LASSO_PROFILE_ERROR_CANNOT_VERIFY_SIGNATURE) {
-				rc = 0;
-			}
-			break;
-		default:
-			g_assert(0);
-	}
 cleanup:
 	return rc;
 }
