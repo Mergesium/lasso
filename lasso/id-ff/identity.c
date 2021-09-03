@@ -35,10 +35,6 @@
 #include "../utils.h"
 #include "identity.h"
 
-#ifdef LASSO_WSF_ENABLED
-#include "../id-wsf/id_ff_extensions.h"
-#endif
-
 #include "identityprivate.h"
 #include "../lasso_config.h"
 
@@ -144,22 +140,11 @@ add_childnode_from_hashtable(G_GNUC_UNUSED gchar *key, LassoNode *value, xmlNode
 	xmlAddChild(xmlnode, lasso_node_get_xmlNode(LASSO_NODE(value), TRUE));
 }
 
-#ifdef LASSO_WSF_ENABLED
-static void
-add_text_childnode_from_list(gchar *value, xmlNode *xmlnode)
-{
-	xmlNewTextChild(xmlnode, NULL, (xmlChar*)"SvcMDID", (xmlChar*)value);
-}
-#endif
-
 static xmlNode*
 get_xmlNode(LassoNode *node, G_GNUC_UNUSED gboolean lasso_dump)
 {
 	xmlNode *xmlnode;
 	LassoIdentity *identity = LASSO_IDENTITY(node);
-#ifdef LASSO_WSF_ENABLED
-	xmlNode *t;
-#endif
 
 	xmlnode = xmlNewNode(NULL, (xmlChar*)"Identity");
 	xmlSetNs(xmlnode, xmlNewNs(xmlnode, (xmlChar*)LASSO_LASSO_HREF, NULL));
@@ -169,19 +154,6 @@ get_xmlNode(LassoNode *node, G_GNUC_UNUSED gboolean lasso_dump)
 	if (g_hash_table_size(identity->federations))
 		g_hash_table_foreach(identity->federations,
 				(GHFunc)add_childnode_from_hashtable, xmlnode);
-#ifdef LASSO_WSF_ENABLED
-	/* Resource Offerings */
-	g_hash_table_foreach(identity->private_data->resource_offerings_map,
-			(GHFunc)add_childnode_from_hashtable, xmlnode);
-
-	/* Service Metadatas IDs (svcMDID) */
-	if (identity->private_data->svcMDID != NULL) {
-		t = xmlNewTextChild(xmlnode, NULL, (xmlChar*)"SvcMDIDs", NULL);
-		g_list_foreach(identity->private_data->svcMDID,
-				(GFunc)add_text_childnode_from_list, t);
-	}
-#endif
-
 	return xmlnode;
 }
 
@@ -190,11 +162,6 @@ init_from_xml(LassoNode *node, xmlNode *xmlnode)
 {
 	LassoIdentity *identity = LASSO_IDENTITY(node);
 	xmlNode *t;
-#ifdef LASSO_WSF_ENABLED
-	xmlNode *t2;
-	xmlChar *xml_content;
-	gchar *content;
-#endif
 
 	t = xmlnode->children;
 	while (t) {
@@ -212,34 +179,6 @@ init_from_xml(LassoNode *node, xmlNode *xmlnode)
 					g_strdup(federation->remote_providerID), federation);
 		}
 
-#ifdef LASSO_WSF_ENABLED
-		/* Resource Offerings */
-		if (strcmp((char*)t->name, "ResourceOffering") == 0) {
-			LassoDiscoResourceOffering *offering;
-			offering = LASSO_DISCO_RESOURCE_OFFERING(lasso_node_new_from_xmlNode(t));
-			g_hash_table_insert(identity->private_data->resource_offerings_map,
-				g_strdup(offering->entryID),
-				g_object_ref(offering));
-		}
-
-		/* Service Metadatas IDs (SvcMDID) */
-		if (strcmp((char*)t->name, "SvcMDIDs") == 0) {
-			t2 = t->children;
-			while (t2) {
-				if (t2->type != XML_ELEMENT_NODE) {
-					t2 = t2->next;
-					continue;
-				}
-				xml_content = xmlNodeGetContent(t2);
-				content = g_strdup((gchar *)xml_content);
-				identity->private_data->svcMDID = g_list_append(
-					identity->private_data->svcMDID, content);
-				xmlFree(xml_content);
-				t2 = t2->next;
-			}
-		}
-#endif
-
 		t = t->next;
 	}
 
@@ -256,16 +195,9 @@ dispose(GObject *object)
 {
 	LassoIdentity *identity = LASSO_IDENTITY(object);
 
-
 	if (identity->private_data->dispose_has_run == FALSE) {
 		identity->private_data->dispose_has_run = TRUE;
-#ifdef LASSO_WSF_ENABLED
-		lasso_release_list_of_strings(identity->private_data->svcMDID);
-		lasso_release_ghashtable(identity->private_data->resource_offerings_map);
-#endif
-
 		lasso_release_ghashtable(identity->federations);
-
 		G_OBJECT_CLASS(parent_class)->dispose(object);
 	}
 }
@@ -288,12 +220,6 @@ instance_init(LassoIdentity *identity)
 {
 	identity->private_data = g_new0(LassoIdentityPrivate, 1);
 	identity->private_data->dispose_has_run = FALSE;
-#ifdef LASSO_WSF_ENABLED
-	identity->private_data->svcMDID = NULL;
-	identity->private_data->last_entry_id = 0;
-	identity->private_data->resource_offerings_map = g_hash_table_new_full(g_str_hash,
-			g_str_equal, (GDestroyNotify)g_free, (GDestroyNotify)g_object_unref);
-#endif
 	identity->federations = g_hash_table_new_full(g_str_hash, g_str_equal,
 			(GDestroyNotify)g_free,
 			(GDestroyNotify)lasso_federation_destroy);

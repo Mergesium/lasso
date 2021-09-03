@@ -30,10 +30,6 @@ TOCOPY=gobject_handling.c glist_handling.c ghashtable_handling.c Makefile.PL \
 
 EXTRA_DIST=$(TOCOPY) typemap-in typemap-out lang.py __init__.py test.sh
 
-if WSF_ENABLED
-EXTRA_ARGS = --enable-id-wsf
-endif
-
 # Copy if out of a build
 Makefile.perl: $(srcdir)/Makefile.PL Lasso.xs Lasso.pm
 	$(AM_V_GEN) if [ "$(srcdir)" != "$(builddir)" ]; then \

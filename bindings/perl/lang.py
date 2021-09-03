@@ -208,7 +208,7 @@ INCLUDE: LassoNode.xs
                     self.xs.pn('sv_setiv(ct, %s);' % name)
                 elif type == 's':
                     self.xs.pn('sv_setpv(ct, %s);' % name)
-                elif type == 'b': # only one case LASSO_WSF_ENABLED
+                elif type == 'b':
                     self.xs.unindent()
                     self.xs.pn('''#ifdef %s
         sv_setiv(ct, 1);
@@ -224,7 +224,7 @@ INCLUDE: LassoNode.xs
                     self.xs.pn('ct = newSViv(%s);' % name)
                 elif type == 's':
                     self.xs.pn('ct = newSVpv((char*)%s, 0);' % name)
-                elif type == 'b': # only one case LASSO_WSF_ENABLED
+                elif type == 'b':
                     self.xs.unindent()
                     self.xs.pn('''#ifdef %s
         ct = newSViv(1);

@@ -41,10 +41,6 @@
 #include "../utils.h"
 #include "../debug.h"
 #include "../lasso_config.h"
-#ifdef LASSO_WSF_ENABLED
-#include "../id-wsf/id_ff_extensions_private.h"
-#include "../id-wsf-2.0/serverprivate.h"
-#endif
 
 #define RSA_SHA1 "RSA_SHA1"
 #define DSA_SHA1 "DSA_SHA1"
@@ -297,11 +293,6 @@ static struct XmlSnippet schema_snippets[] = {
 	{ "SignatureMethod", SNIPPET_ATTRIBUTE, 0, NULL, NULL, NULL },
 	{ "Providers", SNIPPET_LIST_NODES, 0, NULL, NULL, NULL },
 	{ "ServerDumpVersion", SNIPPET_ATTRIBUTE, 0, NULL, NULL, NULL },
-#ifdef LASSO_WSF_ENABLED
-	{ "Services", SNIPPET_LIST_NODES, 0, NULL, NULL, NULL },
-	{ "SvcMDs", SNIPPET_LIST_NODES, 0, NULL, NULL, NULL },
-#endif
-
 	{NULL, 0, 0, NULL, NULL, NULL}
 };
 
@@ -340,11 +331,6 @@ get_xmlNode(LassoNode *node, gboolean lasso_dump)
 		g_hash_table_foreach(server->providers,
 				(GHFunc)add_provider_childnode, t);
 	}
-
-#ifdef LASSO_WSF_ENABLED
-	lasso_server_dump_id_wsf_services(server, xmlnode);
-	lasso_server_dump_id_wsf20_svcmds(server, xmlnode);
-#endif
 
 	xmlCleanNs(xmlnode);
 	lasso_transfer_xml_node(ret_xmlnode, xmlnode);
@@ -422,12 +408,6 @@ init_from_xml(LassoNode *node, xmlNode *xmlnode)
 				t2 = xmlSecGetNextElementNode(t2->next);
 			}
 		}
-
-#ifdef LASSO_WSF_ENABLED
-		lasso_server_init_id_wsf_services(server, t);
-		lasso_server_init_id_wsf20_svcmds(server, t);
-#endif
-
 		t = xmlSecGetNextElementNode(t->next);
 	}
 

@@ -32,20 +32,11 @@ extern "C" {
 #include "config.h"
 #include "../xml/saml-2.0/saml2_assertion.h"
 
-#ifdef LASSO_WSF_ENABLED
-#include "../xml/disco_resource_id.h"
-#include "../xml/disco_encrypted_resource_id.h"
-#endif
-
 struct _LassoLoginPrivate
 {
 	char *soap_request_msg;
 	LassoSaml2Assertion *saml2_assertion;
 	char *request_id;
-#ifdef LASSO_WSF_ENABLED
-	LassoDiscoResourceID *resourceId;
-	LassoDiscoEncryptedResourceID *encryptedResourceId;
-#endif
 };
 
 #ifdef __cplusplus

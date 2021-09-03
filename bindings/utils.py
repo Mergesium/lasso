@@ -86,9 +86,6 @@ def format_as_camelcase(var):
 def format_as_underscored(var):
     '''Format an identifier name into underscored_name'''
     var = '_'.join(camelcase_to_list(var))
-    var = var.replace('id_wsf2_', 'idwsf2_')
-    var = var.replace('_saslresponse', '_sasl_response')
-    var = var.replace('ws_addr_', 'wsa_')
     return var
 
 def format_underscore_as_camelcase(var):

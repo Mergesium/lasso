@@ -10,14 +10,6 @@
 /* Windows version of the lasso version */
 #define LASSO_WINDOWS_VERSION @WINDOWS_VERSION@
 
-/* Define if ID-WSF support is enabled */
-/* #undef LASSO_WSF_ENABLED */
-#if @LASSO_WSF_SUPPORT@
-#  define LASSO_WSF_ENABLED
-#else
-#  undef LASSO_WSF_ENABLED
-#endif
-
 /* Name of package */
 #define PACKAGE "@PACKAGE@"
 

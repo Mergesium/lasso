@@ -81,12 +81,12 @@ EXTRA_HFILES=
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
 IGNORE_HFILES= sessionprivate.h logoutprivate.h loginprivate.h profileprivate.h \
 identityprivate.h serverprivate.h providerprivate.h id_ff_extensions_private.h \
-wsf_profile_private.h private.h saml_2_0_loginprivate.h \
+private.h saml_2_0_loginprivate.h \
 saml_2_0_profileprivate.h saml_2_0_logoutprivate.h ecpprivate.h \
 saml_2_0_serverprivate.h saml_2_0_providerprivate.h federationprivate.h \
-registry-private.h id_wsf_2_0_sessionprivate.h id_wsf_2_0_serverprivate.h \
-saml2_login_private.h id_wsf_2_0_private.h \
-backward_comp.h id_wsf_2.h id_wsf.h lasso_config.h utils.h debug.h
+registry-private.h \
+saml2_login_private.h \
+backward_comp.h lasso_config.h utils.h debug.h
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
 HTML_IMAGES=
@@ -115,22 +115,12 @@ include $(top_srcdir)/gtk-doc.make
 
 # Other files to distribute
 # e.g. EXTRA_DIST += version.xml.in
-EXTRA_DIST += lasso-sections.txt lasso-docs.xml version.xml.in lasso.types.in style.css
+EXTRA_DIST += lasso-sections.txt lasso-docs.xml version.xml.in lasso.types style.css
 
 # Files not to distribute
 # for --rebuild-types in $(SCAN_OPTIONS), e.g. $(DOC_MODULE).types
 # for --rebuild-sections in $(SCAN_OPTIONS) e.g. $(DOC_MODULE)-sections.txt
 # DISTCLEANFILES =
-
-# Generate lasso.types depending on the WSF_ENABLED flag
-if WSF_ENABLED
-lasso.types: lasso.types.in
-	sed -e 's/#WSF# //g' < $(srcdir)/lasso.types.in > lasso.types
-else
-lasso.types: lasso.types.in
-	grep -v '#WSF#' $(srcdir)/lasso.types.in > lasso.types
-endif
-
 
 # Comment this out if you want your docs-status tested during 'make check'
 if ENABLE_GTK_DOC

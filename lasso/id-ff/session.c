@@ -43,10 +43,6 @@
 #include <xmlsec/xmltree.h>
 #include <xmlsec/base64.h>
 
-#ifdef LASSO_WSF_ENABLED
-#include "../id-wsf-2.0/sessionprivate.h"
-#endif
-
 static gboolean lasso_match_name_id(LassoNode *a, LassoNode *b);
 
 struct _NidAndSessionIndex {
@@ -355,23 +351,6 @@ lasso_session_add_assertion(LassoSession *session, const char *providerID, Lasso
 	if (ret != 0) {
 		return ret;
 	}
-	/* ID-WSF specific need */
-	if (LASSO_IS_SAML_ASSERTION(assertion)) {
-		LassoSamlAssertion *saml_assertion = LASSO_SAML_ASSERTION(assertion);
-		if (saml_assertion->Advice) {
-			LassoSamlAdvice *advice = saml_assertion->Advice;
-			LassoSamlAssertion *advice_assertion = (LassoSamlAssertion*)advice->Assertion;
-			if (LASSO_IS_SAML_ASSERTION(advice_assertion)) {
-				xmlNode *node = lasso_node_get_original_xmlnode(&advice_assertion->parent);
-				if (xmlSecCheckNodeName(node, (xmlChar*)"Assertion", (xmlChar*)LASSO_SAML_ASSERTION_HREF)) {
-					xmlChar *id = xmlGetProp(node, (xmlChar*)"AssertionID");
-					ret = lasso_session_add_assertion_with_id(session, (char*)id, node);
-					xmlFree(id);
-				}
-			}
-		}
-	}
-
 	session->is_dirty = TRUE;
 
 	return ret;
@@ -606,11 +585,6 @@ lasso_session_is_empty(LassoSession *session)
 	{
 		return FALSE;
 	}
-#ifdef LASSO_WSF_ENABLED
-	if (g_hash_table_size(session->eprs)) {
-		return FALSE;
-	}
-#endif
 
 	return TRUE;
 }
@@ -818,10 +792,6 @@ get_xmlNode(LassoNode *node, G_GNUC_UNUSED gboolean lasso_dump)
 				(GHFunc)xmlnode_add_assertion_nid_and_session_indexes, &context);
 	}
 
-#ifdef LASSO_WSF_ENABLED
-	lasso_session_id_wsf2_dump_eprs(session, xmlnode);
-#endif
-
 	return xmlnode;
 }
 
@@ -950,10 +920,6 @@ init_from_xml(LassoNode *node, xmlNode *xmlnode)
 			init_from_xml_nid_and_session_index(node, t);
 		}
 
-#ifdef LASSO_WSF_ENABLED
-	lasso_session_id_wsf2_init_eprs(session, t);
-#endif
-
 		t = t->next;
 	}
 	return 0;
@@ -981,10 +947,6 @@ dispose(GObject *object)
 	lasso_release_ghashtable(session->private_data->assertions_by_id);
 	lasso_release_ghashtable(session->private_data->nid_and_session_indexes);
 
-#ifdef LASSO_WSF_ENABLED
-	lasso_release_ghashtable(session->private_data->eprs);
-#endif
-
 	G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 
@@ -1011,11 +973,6 @@ instance_init(LassoSession *session)
 	session->private_data->nid_and_session_indexes = g_hash_table_new_full(g_str_hash,
 			g_str_equal, (GDestroyNotify)g_free,
 			(GDestroyNotify)lasso_release_list_of_nid_an_session_index);
-#ifdef LASSO_WSF_ENABLED
-	session->private_data->eprs = g_hash_table_new_full(g_str_hash, g_str_equal,
-			(GDestroyNotify)g_free,
-			(GDestroyNotify)g_object_unref);
-#endif
 }
 
 static void

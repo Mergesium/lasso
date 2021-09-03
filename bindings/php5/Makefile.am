@@ -24,11 +24,6 @@ nodist_lasso_la_SOURCES = _lasso.c
 
 BUILT_SOURCES = _lasso.c
 
-if WSF_ENABLED
-EXTRA_ARGS = --enable-id-wsf
-endif
-
-
 lasso.php _lasso.c: lang.py wrapper_source.py wrapper_header.py wrapper_source_top.c php_code.py ../overrides.xml
 	$(AM_V_GEN) $(PYTHON) $(top_srcdir)/bindings/bindings.py -l php5 --src-dir=$(top_srcdir)/lasso/ $(EXTRA_ARGS)
 

@@ -11,7 +11,6 @@ def main(args):
     options = opt()
     srcdir = args[1]
     options.srcdir = srcdir
-    options.idwsf = None
     options.language = None
     options.exception_doc = None
     bindings.binding = bindings.BindingData(options)

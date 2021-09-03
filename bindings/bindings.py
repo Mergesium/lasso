@@ -268,8 +268,6 @@ class Function:
                 skip = func.attrib.get('skip')
                 if skip == 'true':
                     self.skip = True
-                elif skip == 'unless-id-wsf' and not binding.options.idwsf:
-                    self.skip = True
                 elif binding.options.language in skip.split(','):
                     self.skip = True
             if func.attrib.get('return_type_qualifier'):
@@ -558,18 +556,10 @@ def parse_header(header_file):
 
 
 def parse_headers(srcdir):
-    wsf_prefixes = ['disco_', 'dst_', 'is_', 'profile_service_', 'discovery_',
-            'wsf_', 'interaction_', 'utility_', 'sa_', 'authentication_',
-            'wsse_', 'sec_', 'idwsf2_', 'wsf2_', 'wsa_', 'wsu', 'soap_binding']
-
     srcdir = os.path.abspath(srcdir)
     parentdir = os.path.dirname(srcdir)
 
-    exclusion = ('xml_idff.h', 'xml_idwsf.h', 'xml_saml2.h', \
-            'xml_idwsf2.h', 'xml_soap11.h',
-            'lasso_config.h', 'saml2_xsd.h' )
-    if not binding.options.idwsf:
-        exclusion += ( 'idwsf_strings.h', )
+    exclusion = ('xml_idff.h', 'xml_saml2.h', 'xml_soap11.h', 'lasso_config.h', 'saml2_xsd.h' )
     for base, dirnames, filenames in os.walk(srcdir):
         dirnames.sort()
         filenames.sort()
@@ -580,10 +570,6 @@ def parse_headers(srcdir):
         if not 'Makefile.am' in filenames:
             # not a source dir
             continue
-        if not binding.options.idwsf and (bname == 'id-wsf' or \
-                bname == 'id-wsf-2.0' or bname == 'ws'):
-            # ignore ID-WSF
-            continue
         makefile_am = open(os.path.join(base, 'Makefile.am')).read()
         filenames = [x for x in filenames if x.endswith('.h') if x in makefile_am]
         for filename in filenames:
@@ -591,15 +577,11 @@ def parse_headers(srcdir):
                 continue
             if 'private' in filename:
                 continue
-            if not binding.options.idwsf:
-                if True in (filename.startswith(wsf_prefix) for wsf_prefix in wsf_prefixes):
-                    continue
             header_path = os.path.join(base, filename)
             header_relpath = os.path.relpath(header_path, parentdir)
 
             binding.headers.append(header_relpath)
             parse_header(header_path)
-    binding.constants.append(('b', 'LASSO_WSF_ENABLED'))
 
 def main():
     global binding
@@ -607,7 +589,6 @@ def main():
     parser = OptionParser()
     parser.add_option('-l', '--language', dest = 'language')
     parser.add_option('-s', '--src-dir', dest = 'srcdir', default = '../lasso/')
-    parser.add_option('--enable-id-wsf', dest = 'idwsf', action = 'store_true')
     parser.add_option('--enable-exception-docs', dest= 'exception_doc', action = 'store_true')
 
     options, args = parser.parse_args()

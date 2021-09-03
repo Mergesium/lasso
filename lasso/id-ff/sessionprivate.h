@@ -41,9 +41,6 @@ struct _LassoSessionPrivate
 	GHashTable *status; /* hold temporary response status for sso-art */
 	GHashTable *assertions_by_id;
 	GHashTable *nid_and_session_indexes;
-#ifdef LASSO_WSF_ENABLED
-	GHashTable *eprs;
-#endif
 };
 
 #define LASSO_SESSION_GET_PRIVATE(o) \

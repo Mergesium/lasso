@@ -143,7 +143,7 @@ typedef enum {
  * LassoProtocolConformance:
  * @LASSO_PROTOCOL_LIBERTY_1_0: Liberty ID-FF 1.0
  * @LASSO_PROTOCOL_LIBERTY_1_1: Liberty ID-FF 1.1
- * @LASSO_PROTOCOL_LIBERTY_1_2: Liberty ID-FF 1.2 / ID-WSF 1.0
+ * @LASSO_PROTOCOL_LIBERTY_1_2: Liberty ID-FF 1.2
  * @LASSO_PROTOCOL_SAML_2_0: SAML 2.0
  *
  * Provider protocol conformance.

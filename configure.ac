@@ -679,18 +679,6 @@ AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
-dnl Check if wsf is explicitly disabled.
-AC_ARG_ENABLE(wsf, [  --enable-wsf            enable experimental ID-WSF],
-		enable_wsf="yes", enable_wsf="no")
-
-AM_CONDITIONAL([WSF_ENABLED],[test "x$enable_wsf" = "xyes"])
-LASSO_WSF_SUPPORT=0
-if test "x$enable_wsf" = "xyes"; then
-	AC_DEFINE(LASSO_WSF_ENABLED, [], [Define if ID-WSF support is enabled])
-	LASSO_WSF_SUPPORT=1
-fi
-AC_SUBST(LASSO_WSF_SUPPORT)
-
 
 dnl API Reference documentation support
 # gtkdocize greps for ^GTK_DOC_CHECK and parses it, so you need to have
@@ -745,21 +733,6 @@ CHECK_LIBS="-lcheck"
 fi
 
 AM_CONDITIONAL(WITH_TESTS, [test "x$enable_tests" = "xyes"])
-
-AC_ARG_WITH(sasl2, [  --with-sasl2[=PFX]         Use Cyrus SASL library version 2 for WSF-Auth])
-if test "x$enable_wsf" = "xyes"; then
-	if test "$with_sasl2" != "no" && test "$with_sasl2" != "yes"
-	then
-		CPPFLAGS="$CPPFLAGS -I$with_sasl2/include"
-		LDFLAGS="$LDFLAGS -L$with_sasl2/lib"
-	fi
-		
-	saved_LIBS="$LIBS"
-	AC_CHECK_LIB(sasl2, sasl_server_init,,
-		AC_MSG_ERROR([libsasl must be installed for WSF support]),)
-	LIBS="$saved_LIBS"
-	LASSO_LIBS="$LASSO_LIBS -lsasl2"
-fi
 
 AC_CHECK_PROGS(REST2HTML, rest2html rst2html)
 AM_CONDITIONAL(HAVE_REST2HTML, test -n "$ac_cv_prog_REST2HTML")
@@ -907,15 +880,11 @@ docs/reference/lasso/version.xml
 docs/reference/lasso/Makefile
 lasso/Makefile
 lasso/id-ff/Makefile
-lasso/id-wsf/Makefile
 lasso/saml-2.0/Makefile
-lasso/id-wsf-2.0/Makefile
 lasso/xml/Makefile
 lasso/xml/ecp/Makefile
 lasso/xml/saml-2.0/Makefile
 lasso/xml/soap-1.1/Makefile
-lasso/xml/id-wsf-2.0/Makefile
-lasso/xml/ws/Makefile
 lasso/xml/dsig/Makefile
 tests/Makefile
 tests/data/Makefile
@@ -961,7 +930,6 @@ Compiler:                ${CC}
 CFLAGS:                  ${AM_CFLAGS} ${CFLAGS}
 Install prefix:          ${prefix}
 Debugging:               $enable_debugging
-Experimental ID-WSF:     $enable_wsf
 
 Optionals builds
 ----------------

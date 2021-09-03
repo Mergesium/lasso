@@ -202,17 +202,6 @@
 #define LASSO_SAML2_NAME_IDENTIFIER_FORMAT_ENCRYPTED \
 		"urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"
 
-/* Attribute Names */
-
-/**
- * LASSO_SAML2_ATTRIBUTE_NAME_EPR:
- *
- * Attribute name for tranmitting Discovery bootstrap EPR when using ID-WSF 2.0 framework. It must
- * be used conjointly with #LASSO_SAML2_ATTRIBUTE_NAME_FORMAT_URI as format for the attribute
- * element.
- */
-#define LASSO_SAML2_ATTRIBUTE_NAME_EPR "urn:liberty:disco:2006-08:DiscoveryEPR"
-
 /* Attribute Name Format */
 
 /**

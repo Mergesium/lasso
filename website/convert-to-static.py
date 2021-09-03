@@ -139,7 +139,7 @@ re_summary = re.compile('[a-z]+\.[0-9]{4}.xml')
 if not os.path.exists('web-static'):
     os.mkdir('web-static')
 
-for BUILDLOGS_DIR in ('build-logs', 'build-logs-wsf'):
+for BUILDLOGS_DIR in ('build-logs'):
     if not os.path.exists('web/%s' % BUILDLOGS_DIR):
         continue
     if not os.path.exists('web-static/%s' % BUILDLOGS_DIR):
@@ -249,9 +249,6 @@ for BUILDLOGS_DIR in ('build-logs', 'build-logs-wsf'):
     base_template.generate(fd, {'body': body, 'title': 'Build Box', 'section': 'buildbox'})
     if BUILDLOGS_DIR == 'build-logs':
         with open('web-static/buildbox.html', 'w') as f:
-            f.write(fd.getvalue())
-    elif BUILDLOGS_DIR == 'build-logs-wsf':
-        with open('web-static/buildbox-wsf.html', 'w') as f:
             f.write(fd.getvalue())
 
 for base, dirs, files in os.walk('web'):

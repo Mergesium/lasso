@@ -28,10 +28,6 @@ endif
 java_extension_LTLIBRARIES = libjnilasso.la
 java_extensiondir = ${libdir}/java
 
-if WSF_ENABLED
-EXTRA_ARGS = --enable-id-wsf
-endif
-
 java_lasso_source_files := $(shell $(PYTHON) $(top_srcdir)/bindings/bindings.py -l java-list --src-dir=$(top_srcdir)/lasso/ $(EXTRA_ARGS) )
 
 lasso_jardir=$(prefix)/share/java

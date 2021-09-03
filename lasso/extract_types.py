@@ -6,23 +6,11 @@ import re
 import sys
 import six
 
-enable_wsf = 0
-
-if '-wsf' in sys.argv:
-    enable_wsf = 1
-
-if len(sys.argv) == 2+enable_wsf:
+if len(sys.argv) == 2:
     srcdir = sys.argv[1]
 else:
     srcdir = '.'
 
-wsf = ['lasso_disco_', 'lasso_dst_', 'lasso_is_', 'lasso_profile_service_',
-        'lasso_discovery', 'lasso_wsf', 'lasso_interaction_', 'lasso_utility_',
-        'lasso_sa_', 'lasso_soap_binding', 'lasso_authentication', 'lasso_wsse_',
-        'lasso_sec_', 'lasso_idwsf2', 'lasso_wsf2', 'lasso_wsa_',
-        'lasso_wsu_']
-if enable_wsf:
-    wsf = []
 
 fd = io.StringIO()
 
@@ -33,18 +21,13 @@ six.print_(u"", file=fd)
 
 header_files = []
 for header_file in sorted(glob.glob('%s/*/*.h' % srcdir) + glob.glob('%s/*/*/*.h' % srcdir)):
-    if ('/id-wsf/' in header_file or '/id-wsf-2.0' in header_file) and not enable_wsf:
-        continue
+    assert not ('/id-wsf/' in header_file or '/id-wsf-2.0' in header_file)
     header_files.append(header_file)
     try:
         type = re.findall('lasso_.*get_type', io.open(header_file, encoding='utf-8').read())[0]
     except IndexError:
         continue
-    for t in wsf:
-        if type.startswith(t):
-            break
-    else:
-        six.print_("extern GType %s();" % type, file=fd)
+    six.print_("extern GType %s();" % type, file=fd)
 
 six.print_(u"", file=fd)
 six.print_(u"type_function functions[] = {", file=fd)
@@ -53,11 +36,7 @@ for header_file in header_files:
         type = re.findall('lasso_.*get_type', io.open(header_file, encoding='utf-8').read())[0]
     except IndexError:
         continue
-    for t in wsf:
-        if type.startswith(t):
-            break
-    else:
-        six.print_(u"\t%s," % type, file=fd)
+    six.print_(u"\t%s," % type, file=fd)
 six.print_(u"\tNULL", file=fd)
 six.print_(u"};", file=fd)
 

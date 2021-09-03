@@ -47,9 +47,6 @@ testSuites = [
     ]
 
 import lasso
-if lasso.WSF_SUPPORT:
-    testSuites.append('idwsf1_tests')
-    testSuites.append('idwsf2_tests')
 
 
 # Parse command line options.

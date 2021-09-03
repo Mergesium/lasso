@@ -1,11 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-WSF_TESTS=
-
-if WSF_ENABLED
-WSF_TESTS+=idwsf2_tests.c
-endif
-
 if WITH_TESTS
 
 TESTS = tests tests2
@@ -20,7 +14,7 @@ AM_CPPFLAGS = \
 	$(CHECK_CFLAGS)
 
 
-tests_SOURCES = tests.c login_tests.c basic_tests.c non_regression_tests.c random_tests.c metadata_tests.c login_tests_saml2.c assertion_query_saml2.c $(WSF_TESTS)
+tests_SOURCES = tests.c login_tests.c basic_tests.c non_regression_tests.c random_tests.c metadata_tests.c login_tests_saml2.c assertion_query_saml2.c
 
 tests_LDADD = \
 	$(top_builddir)/lasso/liblasso.la \

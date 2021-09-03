@@ -98,9 +98,6 @@ function lassoGetRequestTypeFromSoapMsg($mesg) {
     return lasso_get_request_type_from_soap_msg($mesg);
 }
 
-function lassoRegisterIdWsf2DstService($prefix, $href) {
-    lasso_register_idwsf2_dst_service($prefix, $href);
-}
 ''', file=self.fd)
 
     def generate_class(self, klass):

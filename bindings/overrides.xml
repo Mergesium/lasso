@@ -34,17 +34,6 @@
   	rename="lasso_profile_has_dirty_identity"/>
   <func name="lasso_profile_is_session_dirty"
   	rename="lasso_profile_has_dirty_session"/>
-  <!-- LassoWsfProfile -->
-  <func name="lasso_wsf_profile_get_identity" return_owner="false" />
-  <func name="lasso_wsf_profile_get_session" return_owner="false" />
-  <func name="lasso_wsf_profile_get_remote_provider" skip="java,perl"/>
-  <func name="lasso_data_service_get_answer" skip="java,perl"/>
-  <func name="lasso_data_service_get_query_item" skip="java,perl"/>
-  <func name="lasso_data_service_add_modification" skip="java,perl"/>
-  <func name="lasso_data_service_get_answers" skip="java,perl"/>
-  <func name="lasso_data_service_get_answers_by_select" skip="java,perl"/>
-  <func name="lasso_data_service_get_answers_by_item_id" skip="java,perl"/>
-  <func name="lasso_saml2_encrypted_element_decrypt" skip="true"/>
   <!-- LassoIdentity -->
   <func name="lasso_identity_get_federation" return_owner="false" />
   <func name="lasso_identity_get_svc_md_ids" return_type_qualifier="char*"/>
@@ -164,8 +153,6 @@
     <param name="service_type" optional="true"/>
   </func>
   <func name="lasso_discovery_get_description_auto" return_owner="false"/>
-  <func name="lasso_server_get_service" skip="unless-id-wsf" />
-  <func name="lasso_login_set_encryptedResourceId" skip="unless-id-wsf"/>
   <func name="lasso_node_new_from_dump" skip="java"/>
   <func name="lasso_node_new_from_soap" skip="java"/>
   <func name="lasso_node_new_from_xmlNode" skip="java"/>
@@ -175,26 +162,6 @@
   <func name="lasso_server_load_metadata" skip="perl,java" />
   <!-- IdWsf -->
   <arg name="abstract" rename="abstract_" language="java"/>
-  <func name="lasso_personal_profile_service_new_full" rename="lasso_personal_profile_server_new_personal_profile_service_full"/>
-  <func name="lasso_wsf_profile_new_full" rename="lasso_wsf_profile_wsf_profile_new_full"/>
-  <func name="lasso_wsa_endpoint_reference_get_target_identity_token" skip="true"/>
-  <func name="lasso_wsa_endpoint_reference_get_security_token" skip="true"/>
-  <func name="lasso_wsa_endpoint_reference_associate_service_to_type" skip="true"/>
-  <func name="lasso_authentication_get_type" skip="true"/>
-  <func name="lasso_authentication_get_type" skip="true"/>
-  <func name="lasso_authentication_new" skip="true"/>
-  <func name="lasso_authentication_destroy" skip="true"/>
-  <func name="lasso_authentication_client_start" skip="true"/>
-  <func name="lasso_authentication_client_step" skip="true"/>
-  <func name="lasso_authentication_get_mechanism_list" skip="true"/>
-  <func name="lasso_authentication_init_request" skip="true"/>
-  <func name="lasso_authentication_process_request_msg" skip="true"/>
-  <func name="lasso_authentication_process_response_msg" skip="true"/>
-  <func name="lasso_authentication_server_start" skip="true"/>
-  <func name="lasso_authentication_server_step" skip="true"/>
-  <struct name="LassoAuthentication" skip="true"/>
-  <func name="lasso_wsse_username_token_derive_key" skip="true"/>
-  <func name="lasso_wsa_endpoint_reference_add_security_token" skip="true"/>
   <func name="lasso_log_set_handler" skip="true"/>
   <func name="lasso_log_remove_handler" skip="true"/>
   <func name="lasso_key_new_for_signature_from_memory" skip="true"/>
@@ -216,9 +183,5 @@
     <category name="Logout" parent="Profile"/>
     <category name="Defederation" parent="Profile"/>
     <category name="NameIdentifierMapping" parent="Profile"/>
-    <category name="WsfProfile" parent="Profile"/>
-    <category name="Discovery" parent="WsfProfile"/>
-    <category name="DataService" parent="WsfProfile"/>
-    <category name="Dst" parent="WsfProfile"/>
   </exception>
 </overrides>

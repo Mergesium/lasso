@@ -7,12 +7,7 @@ import os
 import os.path
 from six import print_
 
-enable_wsf = False
-
-if '-wsf' in sys.argv:
-    enable_wsf = True
-
-if len(sys.argv) == 2+enable_wsf:
+if len(sys.argv) == 2:
     srcdir = sys.argv[1]
 else:
     srcdir = '.'

@@ -32,10 +32,6 @@ _lasso.c lasso.py: $(top_srcdir)/lasso/*.h $(top_srcdir)/lasso/*.c $(top_srcdir)
 
 EXTRA_DIST=lang.py wrapper_bottom.c wrapper_top.c __init__.py examples
 
-if WSF_ENABLED
-EXTRA_ARGS = --enable-id-wsf
-endif
-
 lasso.py _lasso.c: lang.py wrapper_top.c wrapper_bottom.c ../bindings.py
 	$(AM_V_GEN) $(PYTHON) $(top_srcdir)/bindings/bindings.py -l python --src-dir=$(top_srcdir)/lasso/ $(EXTRA_ARGS)
 
