@@ -45,16 +45,19 @@ except NameError:
     srcdir = os.environ.get('TOP_SRCDIR', '.')
     dataDir = '%s/tests/data' % srcdir
 
+
 def server(local_name, remote_role, remote_name):
     pwd = os.path.join(dataDir, local_name, 'password')
     password = None
     if os.path.exists(pwd):
         password = open(pwd).read()
-    s = lasso.Server(os.path.join(dataDir, local_name, 'metadata.xml'),
-            os.path.join(dataDir, local_name, 'private-key.pem'),
-            password)
+    s = lasso.Server(
+        os.path.join(dataDir, local_name, 'metadata.xml'),
+        os.path.join(dataDir, local_name, 'private-key.pem'),
+        password)
     s.addProvider(remote_role, os.path.join(dataDir, remote_name, 'metadata.xml'))
     return s
+
 
 class ServerTestCase(unittest.TestCase):
     def test01(self):
@@ -153,7 +156,6 @@ class LoginTestCase(unittest.TestCase):
         spLogin.request.requestAuthnContext = requestAuthnContext
         spLogin.request.protocolProfile = lasso.LIB_PROTOCOL_PROFILE_BRWS_ART
         spLogin.buildAuthnRequestMsg()
-        authnRequestUrl = spLogin.msgUrl
         authnRequestQuery = spLogin.msgUrl[spLogin.msgUrl.index('?') + 1:]
         idp = lasso.Server(
             os.path.join(dataDir, 'idp1-la/metadata.xml'),
@@ -170,8 +172,7 @@ class LoginTestCase(unittest.TestCase):
         self.assertTrue(idpLogin.request.requestAuthnContext)
         authnContextClassRefsList = idpLogin.request.requestAuthnContext.authnContextClassRef
         self.assertEqual(len(authnContextClassRefsList), 1)
-        self.assertEqual(authnContextClassRefsList[0],
-                             lasso.LIB_AUTHN_CONTEXT_CLASS_REF_PASSWORD)
+        self.assertEqual(authnContextClassRefsList[0], lasso.LIB_AUTHN_CONTEXT_CLASS_REF_PASSWORD)
 
     def test04(self):
         """Conversion of a lib:AuthnRequest with extensions into a query and back."""
@@ -188,7 +189,6 @@ class LoginTestCase(unittest.TestCase):
             os.path.join(dataDir, 'idp1-la/certificate.pem'))
         spLogin = lasso.Login(sp)
         spLogin.initAuthnRequest()
-        requestAuthnContext = lasso.LibRequestAuthnContext()
         extensionList = []
         for extension in (
                 '<action>do</action>',
@@ -199,7 +199,6 @@ class LoginTestCase(unittest.TestCase):
         spLogin.request.extension = tuple(extensionList)
         spLogin.request.protocolProfile = lasso.LIB_PROTOCOL_PROFILE_BRWS_ART
         spLogin.buildAuthnRequestMsg()
-        authnRequestUrl = spLogin.msgUrl
         authnRequestQuery = spLogin.msgUrl[spLogin.msgUrl.index('?') + 1:]
         idp = lasso.Server(
             os.path.join(dataDir, 'idp1-la/metadata.xml'),
@@ -251,7 +250,7 @@ class LoginTestCase(unittest.TestCase):
         assert sp_login2.msgBody
         try:
             idp_login.processResponseMsg(sp_login2.msgBody)
-        except:
+        except Exception:
             raise
         assert isinstance(idp_login.request, lasso.Samlp2AuthnRequest)
 
@@ -262,7 +261,7 @@ class LoginTestCase(unittest.TestCase):
 
         sp_login = lasso.Login(sp_server)
         sp_login.initAuthnRequest()
-        sp_login.request.protocolBinding = lasso.SAML2_METADATA_BINDING_POST;
+        sp_login.request.protocolBinding = lasso.SAML2_METADATA_BINDING_POST
         sp_login.buildAuthnRequestMsg()
         idp_login = lasso.Login(idp_server)
         idp_login.setSignatureVerifyHint(lasso.PROFILE_SIGNATURE_VERIFY_HINT_FORCE)
@@ -300,10 +299,11 @@ class LoginTestCase(unittest.TestCase):
             os.path.join(dataDir, 'sp5-saml2/metadata.xml'))
         idp_login = lasso.Login(idp)
         idp_login.processAuthnRequestMsg(sp_login.msgUrl.split('?')[1])
-        idp_login.protocolProfile = lasso.LOGIN_PROTOCOL_PROFILE_BRWS_POST;
+        idp_login.protocolProfile = lasso.LOGIN_PROTOCOL_PROFILE_BRWS_POST
         idp_login.validateRequestMsg(True, True)
         idp_login.buildAssertion("None", "None", "None", "None", "None")
         idp_login.buildAuthnResponseMsg()
+
 
 class LogoutTestCase(unittest.TestCase):
     def test01(self):
@@ -392,7 +392,8 @@ class LogoutTestCase(unittest.TestCase):
 
     def test05(self):
         '''Test parsing of a logout request with more than one session index'''
-        content = '''<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="xxxx" Version="2.0" IssueInstant="2010-06-14T22:00:00">
+        content = '''<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" \
+xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="xxxx" Version="2.0" IssueInstant="2010-06-14T22:00:00">
         <saml:Issuer>me</saml:Issuer>
         <saml:NameID>coin</saml:NameID>
         <samlp:SessionIndex>id1</samlp:SessionIndex>
@@ -404,6 +405,7 @@ class LogoutTestCase(unittest.TestCase):
         assert isinstance(node, lasso.Samlp2LogoutRequest)
         assert node.sessionIndex == 'id1'
         assert node.sessionIndexes == ('id1', 'id2', 'id3')
+
 
 class DefederationTestCase(unittest.TestCase):
     def test01(self):
@@ -444,31 +446,25 @@ class AttributeAuthorityTestCase(unittest.TestCase):
     def test01(self):
         '''Attribute request and response test between sp5 and idp6'''
         s = lasso.Server(
-                os.path.join(dataDir, 'sp5-saml2/metadata.xml'),
-                os.path.join(dataDir, 'sp5-saml2/private-key.pem'))
-        s.addProvider(lasso.PROVIDER_ROLE_ATTRIBUTE_AUTHORITY,
-                os.path.join(dataDir, 'idp6-saml2/metadata.xml'))
+            os.path.join(dataDir, 'sp5-saml2/metadata.xml'),
+            os.path.join(dataDir, 'sp5-saml2/private-key.pem'))
+        s.addProvider(lasso.PROVIDER_ROLE_ATTRIBUTE_AUTHORITY, os.path.join(dataDir, 'idp6-saml2/metadata.xml'))
 
         s2 = lasso.Server(
-                os.path.join(dataDir, 'idp6-saml2/metadata.xml'),
-                os.path.join(dataDir, 'idp6-saml2/private-key.pem'))
-        s2.addProvider(lasso.PROVIDER_ROLE_SP,
-                os.path.join(dataDir, 'sp5-saml2/metadata.xml'))
+            os.path.join(dataDir, 'idp6-saml2/metadata.xml'),
+            os.path.join(dataDir, 'idp6-saml2/private-key.pem'))
+        s2.addProvider(lasso.PROVIDER_ROLE_SP, os.path.join(dataDir, 'sp5-saml2/metadata.xml'))
 
         aq = lasso.AssertionQuery(s)
         rpid = list(s.providers.keys())[0]
-        aq.initRequest(rpid,
-                lasso.HTTP_METHOD_SOAP,
-                lasso.ASSERTION_QUERY_REQUEST_TYPE_ATTRIBUTE)
+        aq.initRequest(rpid, lasso.HTTP_METHOD_SOAP, lasso.ASSERTION_QUERY_REQUEST_TYPE_ATTRIBUTE)
         assert aq.request
         assert aq.remoteProviderId == rpid
         nid = lasso.Saml2NameID.newWithPersistentFormat(
-                lasso.buildUniqueId(32),
-                s.providerId, s2.providerId)
+            lasso.buildUniqueId(32),
+            s.providerId, s2.providerId)
         aq.nameIdentifier = nid
-        aq.addAttributeRequest(
-                lasso.SAML2_ATTRIBUTE_NAME_FORMAT_BASIC,
-                'testAttribute')
+        aq.addAttributeRequest(lasso.SAML2_ATTRIBUTE_NAME_FORMAT_BASIC, 'testAttribute')
         aq.buildRequestMsg()
         assert aq.msgUrl
         assert aq.msgBody
@@ -483,10 +479,8 @@ class AttributeAuthorityTestCase(unittest.TestCase):
         for attribute in aq2.request.attribute:
             content = lasso.MiscTextNode.newWithString("xxx")
             content.textChild = True
-            assertion.addAttributeWithNode(attribute.name, attribute.nameFormat,
-                    content)
-            assertion.addAttributeWithNode(attribute.name, attribute.nameFormat,
-                    content)
+            assertion.addAttributeWithNode(attribute.name, attribute.nameFormat, content)
+            assertion.addAttributeWithNode(attribute.name, attribute.nameFormat, content)
         assertion.subject = aq.request.subject
         s2.saml2AssertionSetupSignature(assertion)
         aq2.buildResponseMsg()
@@ -508,5 +502,5 @@ allTests = unittest.TestSuite((serverSuite, loginSuite, logoutSuite, defederatio
                                identitySuite, attributeSuite))
 
 if __name__ == '__main__':
-    sys.exit(not unittest.TextTestRunner(verbosity = 2).run(allTests).wasSuccessful())
+    sys.exit(not unittest.TextTestRunner(verbosity=2).run(allTests).wasSuccessful())
 
