@@ -2,7 +2,6 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS		= lasso \
 		  tests \
-		  win32 \
 		  bindings \
 		  docs
 
