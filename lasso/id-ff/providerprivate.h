@@ -78,6 +78,7 @@ struct _LassoProviderPrivate
 	GList *encryption_public_keys;
 	LassoEncryptionMode encryption_mode;
 	LassoEncryptionSymKeyType encryption_sym_key_type;
+	LassoKeyEncryptionMethod key_encryption_method;
 	char *valid_until;
 	char *cache_duration;
 	GList *endpoints; /* of EndpointType_s */
@@ -91,6 +92,7 @@ gboolean lasso_provider_load_public_key(LassoProvider *provider,
 GList* lasso_provider_get_public_keys(const LassoProvider *provider);
 xmlSecKey* lasso_provider_get_encryption_public_key(const LassoProvider *provider);
 LassoEncryptionSymKeyType lasso_provider_get_encryption_sym_key_type(const LassoProvider* provider);
+LassoKeyEncryptionMethod lasso_provider_get_key_encryption_method(const LassoProvider* provider);
 int lasso_provider_verify_saml_signature(LassoProvider *provider, xmlNode *signed_node, xmlDoc *doc);
 int lasso_provider_verify_query_signature(LassoProvider *provider, const char *message);
 void _lasso_provider_load_key_descriptor(LassoProvider *provider, xmlNode *key_descriptor);

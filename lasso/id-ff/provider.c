@@ -903,6 +903,7 @@ instance_init(LassoProvider *provider)
 	provider->private_data->encryption_public_keys = NULL;
 	provider->private_data->encryption_mode = LASSO_ENCRYPTION_MODE_NONE;
 	provider->private_data->encryption_sym_key_type = LASSO_ENCRYPTION_SYM_KEY_TYPE_AES_128;
+	provider->private_data->key_encryption_method = LASSO_KEY_ENCRYPTION_METHOD_DEFAULT;
 	provider->private_data->signature_context = LASSO_SIGNATURE_CONTEXT_NONE;
 
 	/* no value_destroy_func since it shouldn't destroy the GList on insert */
@@ -1533,6 +1534,43 @@ lasso_provider_get_encryption_sym_key_type(const LassoProvider *provider)
 		return provider->private_data->encryption_sym_key_type;
 
 	return LASSO_ENCRYPTION_SYM_KEY_TYPE_DEFAULT;
+}
+
+/**
+ * lasso_provider_set_key_encryption_method:
+ * @provider: provider to set encryption for
+ * @key_encryption_method: enum type for encrypting generated symetric key
+ *
+ * Set the type of the encryption of the generated encryption symetric key
+ **/
+void
+lasso_provider_set_key_encryption_method(LassoProvider *provider,
+		LassoKeyEncryptionMethod key_encryption_method)
+{
+	g_return_if_fail(LASSO_IS_PROVIDER(provider));
+
+	if (key_encryption_method == LASSO_KEY_ENCRYPTION_METHOD_DEFAULT) {
+		key_encryption_method = lasso_get_default_key_encryption_method();
+	}
+	provider->private_data->key_encryption_method = key_encryption_method;;
+}
+
+/**
+ * lasso_provider_get_key_encryption_method:
+ * @provider: a #LassoProvider object
+ *
+ * Return the type of the encryption of the generated encryption symetric key
+ *
+ * Return value: a #LassoKeyEncryptionMethod value.
+ */
+LassoKeyEncryptionMethod
+lasso_provider_get_key_encryption_method(const LassoProvider *provider)
+{
+	if (LASSO_IS_PROVIDER(provider) && provider->private_data)
+		if (provider->private_data->key_encryption_method != LASSO_KEY_ENCRYPTION_METHOD_DEFAULT)
+			return provider->private_data->key_encryption_method;
+
+	return lasso_get_default_key_encryption_method();
 }
 
 /**

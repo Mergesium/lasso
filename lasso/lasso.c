@@ -108,6 +108,8 @@ gboolean lasso_flag_pem_public_key = FALSE;
 #define LASSO_FLAG_ENV_VAR "LASSO_FLAG"
 #endif
 
+#define LASSO_DEFAULT_KEY_ENCRYPTION_METHOD_ENV_VAR "LASSO_DEFAULT_KEY_ENCRYPTION_METHOD"
+
 #if defined _MSC_VER
 HINSTANCE g_hModule = NULL;
 
@@ -187,6 +189,34 @@ set_min_allowed_hash_algo()
 	return rv;
 }
 
+static int
+set_default_key_encryption_method()
+{
+	char *env_encryption_sym_key_encryption_algo = getenv(LASSO_DEFAULT_KEY_ENCRYPTION_METHOD_ENV_VAR);
+	if (env_encryption_sym_key_encryption_algo) {
+		LassoKeyEncryptionMethod method = lasso_parse_key_encryption_method(
+			env_encryption_sym_key_encryption_algo);
+		if (method == -1) {
+			message(G_LOG_LEVEL_CRITICAL, "Unsupported key encryption "
+				"method %s configured in environment variable " LASSO_DEFAULT_KEY_ENCRYPTION_METHOD_ENV_VAR,
+				env_encryption_sym_key_encryption_algo);
+			return LASSO_ERROR_UNDEFINED;
+		}
+		lasso_set_default_key_encryption_method(method);
+		return 0;
+	}
+
+	LassoKeyEncryptionMethod method = lasso_parse_key_encryption_method(DEFAULT_KEY_ENCRYPTION_METHOD);
+	if (method != -1) {
+		lasso_set_default_key_encryption_method(method);
+		return 0;
+	} else {
+		message(G_LOG_LEVEL_CRITICAL, "Unsupported key encryption "
+			"method "DEFAULT_KEY_ENCRYPTION_METHOD" configured");
+		return LASSO_ERROR_UNDEFINED;
+	}
+}
+
 /**
  * lasso_init:
  *
@@ -214,6 +244,9 @@ int lasso_init()
 		return LASSO_ERROR_UNDEFINED;
 	}
 
+	if (set_default_key_encryption_method() != 0) {
+		return LASSO_ERROR_UNDEFINED;
+	}
 
 	/* Init Lasso classes */
 	for (i=0; functions[i]; i++)

@@ -900,6 +900,7 @@ lasso_saml20_login_build_assertion(LassoLogin *login,
 			(LassoNode*)assertion->Subject->NameID,
 			lasso_provider_get_encryption_public_key(provider),
 			lasso_provider_get_encryption_sym_key_type(provider),
+			lasso_provider_get_key_encryption_method(provider),
 			provider->ProviderID);
 		goto_cleanup_if_fail_with_rc(assertion->Subject->EncryptedID != NULL,
 				LASSO_DS_ERROR_ENCRYPTION_FAILED);
@@ -910,7 +911,8 @@ lasso_saml20_login_build_assertion(LassoLogin *login,
 	if (do_encrypt_assertion) {
 		lasso_node_set_encryption((LassoNode*)assertion,
 				lasso_provider_get_encryption_public_key(provider),
-				lasso_provider_get_encryption_sym_key_type(provider));
+				lasso_provider_get_encryption_sym_key_type(provider),
+				lasso_provider_get_key_encryption_method(provider));
 	}
 
 	response = LASSO_SAMLP2_RESPONSE(profile->response);

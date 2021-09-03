@@ -709,17 +709,18 @@ LassoNode*
 lasso_assertion_encrypt(LassoSaml2Assertion *assertion, char *recipient)
 {
 	xmlSecKey *encryption_public_key = NULL;
-	LassoEncryptionSymKeyType encryption_sym_key_type = 0;
+	LassoEncryptionSymKeyType encryption_sym_key_type;
+	LassoKeyEncryptionMethod key_encryption_method;
 	LassoNode *ret = NULL;
 
 	lasso_node_get_encryption((LassoNode*)assertion, &encryption_public_key,
-			&encryption_sym_key_type);
+			&encryption_sym_key_type, &key_encryption_method);
 	if (! encryption_public_key) {
 		return NULL;
 	}
 
 	ret = LASSO_NODE(lasso_node_encrypt(LASSO_NODE(assertion),
-		encryption_public_key, encryption_sym_key_type, recipient));
+		encryption_public_key, encryption_sym_key_type, key_encryption_method, recipient));
 	lasso_release_sec_key(encryption_public_key);
 	return ret;
 

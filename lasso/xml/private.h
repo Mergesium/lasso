@@ -252,7 +252,10 @@ gboolean lasso_node_init_from_deflated_query_part(LassoNode *node, char *deflate
 xmlNode* lasso_node_get_xmlnode_for_any_type(LassoNode *node, xmlNode *cur);
 
 LassoSaml2EncryptedElement* lasso_node_encrypt(LassoNode *lasso_node,
-	xmlSecKey *encryption_public_key, LassoEncryptionSymKeyType encryption_sym_key_type, const char *recipient);
+	xmlSecKey *encryption_public_key,
+	LassoEncryptionSymKeyType encryption_sym_key_type,
+	LassoKeyEncryptionMethod key_encryption_method,
+	const char *recipient);
 
 int lasso_node_decrypt_xmlnode(xmlNode* encrypted_element, GList *encrypted_key,
 		xmlSecKey *encryption_private_key, LassoNode **output);
@@ -305,10 +308,12 @@ int lasso_node_set_signature(LassoNode *node, LassoSignatureContext context);
 LassoSignatureContext lasso_node_get_signature(LassoNode *node);
 
 void lasso_node_set_encryption(LassoNode *node, xmlSecKey *encryption_public_key,
-		LassoEncryptionSymKeyType encryption_sym_key_type);
+		LassoEncryptionSymKeyType encryption_sym_key_type,
+		LassoKeyEncryptionMethod key_encryption_method);
 
 void lasso_node_get_encryption(LassoNode *node, xmlSecKey **encryption_public_key,
-		LassoEncryptionSymKeyType *encryption_sym_key_type);
+		LassoEncryptionSymKeyType *encryption_sym_key_type,
+		LassoKeyEncryptionMethod *key_encryption_method);
 gboolean lasso_base64_decode(const char *from, char **buffer, int *buffer_len);
 
 xmlSecKeyPtr

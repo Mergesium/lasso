@@ -49,6 +49,21 @@ typedef enum {
 	LASSO_ENCRYTPION_SYM_KEY_TYPE_LAST
 } LassoEncryptionSymKeyType;
 
+/**
+ * LassoKeyEncryptionMethod:
+ * @LASSO_KEY_ENCRYPTION_METHOD_PKCS1 : RSA PKCS1.5 padding
+ * @LASSO_KEY_ENCRYPTION_METHOD_OAEP : RSA OAEP padding
+ *
+ * Encryption symetric key encryption type.
+ **/
+typedef enum {
+	LASSO_KEY_ENCRYPTION_METHOD_DEFAULT,
+	LASSO_KEY_ENCRYPTION_METHOD_PKCS1,
+	LASSO_KEY_ENCRYPTION_METHOD_OAEP,
+	LASSO_KEY_ENCRYPTION_METHOD_LAST,
+	LASSO_KEY_ENCRYPTION_METHOD_INVALID = -1
+} LassoKeyEncryptionMethod;
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

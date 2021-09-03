@@ -304,6 +304,58 @@ class LoginTestCase(unittest.TestCase):
         idp_login.buildAssertion("None", "None", "None", "None", "None")
         idp_login.buildAuthnResponseMsg()
 
+    def test08(self):
+        '''Verify KeyEncryptionMethod support'''
+        sp_server = server('sp5-saml2', lasso.PROVIDER_ROLE_IDP, 'idp5-saml2')
+        idp_server = server('idp5-saml2', lasso.PROVIDER_ROLE_SP, 'sp5-saml2')
+
+        def run(key_encryption_method=None):
+            sp_login = lasso.Login(sp_server)
+            sp_login.initAuthnRequest(None, lasso.HTTP_METHOD_REDIRECT)
+            sp_login.buildAuthnRequestMsg()
+
+            provider = idp_server.getProvider('http://sp5/metadata')
+            provider.setEncryptionMode(lasso.ENCRYPTION_MODE_ASSERTION)
+
+            if key_encryption_method:
+                provider.setKeyEncryptionMethod(key_encryption_method)
+
+            idp_login = lasso.Login(idp_server)
+            idp_login.processAuthnRequestMsg(sp_login.msgUrl.split('?')[1])
+            idp_login.protocolProfile = lasso.LOGIN_PROTOCOL_PROFILE_BRWS_POST
+            idp_login.validateRequestMsg(True, True)
+            idp_login.buildAssertion("None", "None", "None", "None", "None")
+            idp_login.buildAuthnResponseMsg()
+
+            sp_login.setSignatureVerifyHint(lasso.PROFILE_SIGNATURE_VERIFY_HINT_FORCE)
+            sp_login.processAuthnResponseMsg(idp_login.msgBody)
+            sp_login.acceptSso()
+            return sp_login.response.debug()
+
+        os.environ['LASSO_DEFAULT_KEY_ENCRYPTION_METHOD'] = 'rsa-pkcs1'
+        lasso.init()
+        assert 'xmlenc#rsa-1_5' in run()
+        assert 'xmlenc#rsa-oaep-mgf1p' not in run()
+
+        os.environ['LASSO_DEFAULT_KEY_ENCRYPTION_METHOD'] = 'rsa-oaep'
+        lasso.init()
+        assert 'xmlenc#rsa-1_5' not in run()
+        assert 'xmlenc#rsa-oaep-mgf1p' in run()
+
+        lasso.setDefaultKeyEncryptionMethod(lasso.KEY_ENCRYPTION_METHOD_PKCS1)
+        assert 'xmlenc#rsa-1_5' in run()
+        assert 'xmlenc#rsa-oaep-mgf1p' not in run()
+
+        lasso.setDefaultKeyEncryptionMethod(lasso.KEY_ENCRYPTION_METHOD_OAEP)
+        assert 'xmlenc#rsa-1_5' not in run()
+        assert 'xmlenc#rsa-oaep-mgf1p' in run()
+
+        assert 'xmlenc#rsa-1_5' in run(key_encryption_method=lasso.KEY_ENCRYPTION_METHOD_PKCS1)
+        assert 'xmlenc#rsa-oaep-mgf1p' not in run(key_encryption_method=lasso.KEY_ENCRYPTION_METHOD_PKCS1)
+
+        assert 'xmlenc#rsa-1_5' not in run(key_encryption_method=lasso.KEY_ENCRYPTION_METHOD_OAEP)
+        assert 'xmlenc#rsa-oaep-mgf1p' in run(key_encryption_method=lasso.KEY_ENCRYPTION_METHOD_OAEP)
+
 
 class LogoutTestCase(unittest.TestCase):
     def test01(self):

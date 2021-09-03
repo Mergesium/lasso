@@ -83,6 +83,7 @@ static void lasso_node_remove_original_xmlnode(LassoNode *node, SnippetType type
 
 static LassoSignatureMethod default_signature_method = LASSO_SIGNATURE_METHOD_RSA_SHA1;
 static LassoSignatureMethod min_signature_method = LASSO_SIGNATURE_METHOD_RSA_SHA1;
+static LassoKeyEncryptionMethod default_encryption_key_encryption_method = LASSO_KEY_ENCRYPTION_METHOD_OAEP;
 
 /*****************************************************************************/
 /* virtual public methods                                                    */
@@ -472,7 +473,9 @@ lasso_node_export_to_soap_with_headers(LassoNode *node, GList *headers)
  **/
 LassoSaml2EncryptedElement*
 lasso_node_encrypt(LassoNode *lasso_node, xmlSecKey *encryption_public_key,
-		LassoEncryptionSymKeyType encryption_sym_key_type, const char *recipient)
+		LassoEncryptionSymKeyType encryption_sym_key_type,
+		LassoKeyEncryptionMethod key_encryption_method,
+		const char *recipient)
 {
 	xmlDocPtr doc = NULL;
 	xmlNodePtr orig_node = NULL;
@@ -484,6 +487,7 @@ lasso_node_encrypt(LassoNode *lasso_node, xmlSecKey *encryption_public_key,
 	xmlNodePtr key_info_node2 = NULL;
 	xmlSecEncCtxPtr enc_ctx = NULL;
 	xmlSecTransformId xmlsec_encryption_sym_key_type;
+	xmlSecTransformId xmlsec_key_encryption_method;
 	xmlSecKey *duplicate = NULL;
 
 	if (encryption_public_key == NULL || !xmlSecKeyIsValid(encryption_public_key)) {
@@ -507,6 +511,17 @@ lasso_node_encrypt(LassoNode *lasso_node, xmlSecKey *encryption_public_key,
 		case LASSO_ENCRYPTION_SYM_KEY_TYPE_AES_128:
 		default:
 			xmlsec_encryption_sym_key_type = xmlSecTransformAes128CbcId;
+			break;
+	}
+
+	/* Get the symetric key encryption type */
+	switch(key_encryption_method) {
+		case LASSO_KEY_ENCRYPTION_METHOD_PKCS1:
+			xmlsec_key_encryption_method = xmlSecTransformRsaPkcs1Id;
+			break;
+		case LASSO_KEY_ENCRYPTION_METHOD_OAEP:
+		default:
+			xmlsec_key_encryption_method = xmlSecTransformRsaOaepId;
 			break;
 	}
 
@@ -560,7 +575,8 @@ lasso_node_encrypt(LassoNode *lasso_node, xmlSecKey *encryption_public_key,
 
 	/* add <enc:EncryptedKey/> to store the encrypted session key */
 	encrypted_key_node = xmlSecTmplKeyInfoAddEncryptedKey(key_info_node,
-			xmlSecTransformRsaPkcs1Id, NULL, NULL, (xmlChar*)recipient);
+			xmlsec_key_encryption_method,
+			NULL, NULL, (xmlChar*)recipient);
 	if (encrypted_key_node == NULL) {
 		message(G_LOG_LEVEL_WARNING, "Failed to add encrypted key");
 		goto cleanup;
@@ -915,6 +931,7 @@ struct _CustomElement {
 	LassoSignatureContext signature_context;
 	xmlSecKey *encryption_public_key;
 	LassoEncryptionSymKeyType encryption_sym_key_type;
+	LassoKeyEncryptionMethod key_encryption_method;
 };
 
 static struct _CustomElement *
@@ -1061,7 +1078,8 @@ lasso_node_get_signature(LassoNode *node)
  */
 void
 lasso_node_set_encryption(LassoNode *node, xmlSecKey *encryption_public_key,
-		LassoEncryptionSymKeyType encryption_sym_key_type)
+		LassoEncryptionSymKeyType encryption_sym_key_type,
+		LassoKeyEncryptionMethod key_encryption_method)
 {
 	struct _CustomElement *custom_element;
 
@@ -1086,6 +1104,12 @@ lasso_node_set_encryption(LassoNode *node, xmlSecKey *encryption_public_key,
 	} else {
 		custom_element->encryption_sym_key_type = LASSO_ENCRYPTION_SYM_KEY_TYPE_DEFAULT;
 	}
+	if (LASSO_KEY_ENCRYPTION_METHOD_DEFAULT < key_encryption_method
+			&& key_encryption_method < LASSO_KEY_ENCRYPTION_METHOD_LAST) {
+		custom_element->key_encryption_method = key_encryption_method;
+	} else {
+		custom_element->key_encryption_method = lasso_get_default_key_encryption_method();
+	}
 }
 
 /**
@@ -1099,7 +1123,8 @@ lasso_node_set_encryption(LassoNode *node, xmlSecKey *encryption_public_key,
  */
 void
 lasso_node_get_encryption(LassoNode *node, xmlSecKey **encryption_public_key,
-		LassoEncryptionSymKeyType *encryption_sym_key_type)
+		LassoEncryptionSymKeyType *encryption_sym_key_type,
+		LassoKeyEncryptionMethod *key_encryption_method)
 {
 	struct _CustomElement *custom_element;
 
@@ -1109,6 +1134,7 @@ lasso_node_get_encryption(LassoNode *node, xmlSecKey **encryption_public_key,
 		lasso_assign_sec_key(*encryption_public_key,
 				custom_element->encryption_public_key);
 		*encryption_sym_key_type = custom_element->encryption_sym_key_type;
+		*key_encryption_method = custom_element->key_encryption_method;
 	}
 }
 
@@ -3580,4 +3606,26 @@ lasso_get_min_signature_method() {
 void
 lasso_set_min_signature_method(LassoSignatureMethod meth) {
 	min_signature_method = meth;
+}
+
+LassoKeyEncryptionMethod
+lasso_parse_key_encryption_method(char *str) {
+
+	if (lasso_strisequal(str, "rsa-pkcs1")) {
+		return LASSO_KEY_ENCRYPTION_METHOD_PKCS1;
+	} else if (lasso_strisequal(str, "rsa-oaep")) {
+		return LASSO_KEY_ENCRYPTION_METHOD_OAEP;
+	}
+	return LASSO_KEY_ENCRYPTION_METHOD_INVALID;
+}
+
+LassoKeyEncryptionMethod
+lasso_get_default_key_encryption_method() {
+	return default_encryption_key_encryption_method;
+}
+
+void
+lasso_set_default_key_encryption_method(LassoKeyEncryptionMethod method)
+{
+	default_encryption_key_encryption_method = method;
 }

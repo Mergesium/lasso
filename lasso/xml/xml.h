@@ -40,6 +40,7 @@ extern "C" {
 #include "../export.h"
 #include "../errors.h"
 #include "strings.h"
+#include "xml_enc.h"
 
 #define LASSO_TYPE_NODE (lasso_node_get_type())
 #define LASSO_NODE(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), LASSO_TYPE_NODE, LassoNode))
@@ -234,6 +235,12 @@ struct _LassoKey;
 
 LASSO_EXPORT char* lasso_node_export_to_saml2_query(LassoNode *node, const char *param_name, const
 		char *url, struct _LassoKey *key);
+
+LASSO_EXPORT LassoKeyEncryptionMethod lasso_parse_key_encryption_method(char *str);
+
+LASSO_EXPORT LassoKeyEncryptionMethod lasso_get_default_key_encryption_method();
+
+LASSO_EXPORT void lasso_set_default_key_encryption_method(LassoKeyEncryptionMethod method);
 
 #ifdef __cplusplus
 }

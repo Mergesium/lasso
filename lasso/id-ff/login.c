@@ -390,6 +390,7 @@ lasso_login_build_assertion(LassoLogin *login,
 					LASSO_NODE(ss->Subject->NameIdentifier),
 					lasso_provider_get_encryption_public_key(provider),
 					lasso_provider_get_encryption_sym_key_type(provider),
+					lasso_provider_get_key_encryption_method(provider),
 					provider->ProviderID));
 		if (encrypted_element != NULL) {
 			lasso_assign_new_gobject(ss->Subject->EncryptedNameIdentifier, encrypted_element);

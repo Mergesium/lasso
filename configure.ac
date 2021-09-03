@@ -804,6 +804,24 @@ fi
 
 AC_DEFINE_UNQUOTED(MIN_HASH_ALGO, "$MIN_HASH_ALGO", ["The minimal hash algorithm"])
 
+AC_ARG_WITH([default-key-encryption-method],
+            [AS_HELP_STRING([--with-default-key-encryption-method=[rsa-pkcs1|rsa-oaep]],
+                            [Default key encryption method (rsa-oaep)]
+                           )
+            ]
+)
+
+KEY_ENCRYPTION_METHOD=rsa-oaep
+if test x"$with_default_" != x; then
+    if test ! "$with_default_key_encryption_method" = "rsa-pkcs1" -a ! "$with_default_key_encryption_method" = "rsa-oaep"; then
+	AC_MSG_ERROR("Default key encryption method must be either rsa-pkcs1 or rsa-oaep")
+    else
+	SIGNING_ALGO=$with_default_key_encryption_method
+    fi
+fi
+
+AC_DEFINE_UNQUOTED(DEFAULT_KEY_ENCRYPTION_METHOD, "$KEY_ENCRYPTION_METHOD", ["The default key encryption method"])
+
 
 dnl ==========================================================================
 dnl Pedantic compilation
@@ -935,4 +953,5 @@ Crypto settings
 ---------------
 Default signature:      ${SIGNING_ALGO}
 Minimal accepted hash:  ${MIN_HASH_ALGO}
+Key encryption method:  ${KEY_ENCRYPTION_METHOD}
 )
