@@ -74,7 +74,7 @@ static struct XmlSnippet schema_snippets[] = {
 	/* Other AuthenticatingAuthority are just ignored, it's a work-around to at least accept correct SAML message.
 	 * See https://dev.entrouvert.org/issues/29340  */
 	{ "AuthenticatingAuthority", SNIPPET_LIST_CONTENT | SNIPPET_OPTIONAL,
-		NULL, NULL, NULL, NULL},
+		0, NULL, NULL, NULL},
 	{NULL, 0, 0, NULL, NULL, NULL}
 };
 
