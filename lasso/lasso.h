@@ -72,6 +72,12 @@ LASSO_EXPORT int lasso_check_version(
 
 LASSO_EXPORT void lasso_set_flag(char *flag);
 
+/* Deprecated functions, kept only to maintain the ABI and the SONAME */
+LASSO_EXPORT void lasso_register_dst_service(const char *prefix, const char *href);
+LASSO_EXPORT char* lasso_get_prefix_for_dst_service_href(const char *href);
+LASSO_EXPORT void lasso_register_idwsf2_dst_service(const gchar *prefix, const gchar *href);
+LASSO_EXPORT gchar* lasso_get_prefix_for_idwsf2_dst_service_href(const gchar *href);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

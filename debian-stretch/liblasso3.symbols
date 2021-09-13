@@ -67,6 +67,8 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_flag_strict_checking@Base 2.3.5
  lasso_flag_thin_sessions@Base 2.5.0
  lasso_flag_verify_signature@Base 2.3.5
+ lasso_get_prefix_for_dst_service_href@Base 2.3.5
+ lasso_get_prefix_for_idwsf2_dst_service_href@Base 2.3.5
  lasso_get_default_key_encryption_method@Base 2.8.0
  lasso_get_default_signature_method@Base 2.8.0
  lasso_identity_destroy@Base 2.3.5
@@ -324,6 +326,8 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_provider_set_server_signing_key@Base 2.5.0
  lasso_provider_verify_signature@Base 2.5.0
  lasso_provider_verify_single_node_signature@Base 2.3.5
+ lasso_register_dst_service@Base 2.3.5
+ lasso_register_idwsf2_dst_service@Base 2.3.5
  lasso_registry_default_add_direct_mapping@Base 2.3.5
  lasso_registry_default_add_functional_mapping@Base 2.3.5
  lasso_registry_default_get_mapping@Base 2.3.5
