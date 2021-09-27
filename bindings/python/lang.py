@@ -728,7 +728,8 @@ register_constants(PyObject *d)
             else:
                 print_('E: unknown constant type: %r' % c[0], file=sys.stderr)
             print_('    PyDict_SetItemString(d, "%s", obj);' % c[1][6:], file=fd)
-            print_('    Py_DECREF(obj);', file=fd)
+            if c[0] != 'b':  # refcount of Py_True/False should not be changed
+                print_('    Py_DECREF(obj);', file=fd)
         print_('}', file=fd)
         print_('', file=fd)
 
