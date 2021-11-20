@@ -9,26 +9,11 @@
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-
-DEB_TARGET_ARCH     := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+include /usr/share/dpkg/architecture.mk
 
 ARCHLIB := $(shell perl -MConfig -e 'print $$Config{vendorarch}')
 
-with_java := no
-no_java_archs := alpha arm hppa hurd-i386
-ifneq ($(DEB_TARGET_ARCH),i386)
- ifneq ($(DEB_TARGET_ARCH),amd64)
-  ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_java_archs)))
-   with_java := disabled for architecture $(DEB_TARGET_ARCH)
-  endif
- endif
-endif
-
-with_php := no
-
-PYVERS		:= $(shell pyversions -vr)
+DEFAULT_PYTHON3	:= $(shell py3versions -dv)
 PY3VERS		:= $(shell py3versions -vr '>= 3.0')
 
 CFLAGS = `dpkg-buildflags --get CFLAGS`
@@ -51,44 +36,32 @@ CONFIGURE_ARGS := \
 	--infodir=\$${prefix}/share/info \
 	--enable-tests=no \
 	--disable-gtk-doc \
+	--disable-java \
+	--disable-php \
 	--enable-perl
 
 
-ifeq ($(with_java),yes)
-  CONFIGURE_ARGS += --enable-java
-else
-  CONFIGURE_ARGS += --disable-java
-endif
-
-ifeq ($(with_php),yes)
-  CONFIGURE_ARGS += --enable-php5 --with-php5-config-dir=/etc/php5/mods-available/ --enable-php7 --with-php7-config-dir=/etc/php/7.3/mods-available/
-else
-  CONFIGURE_ARGS += --disable-php5 --disable-php7
-endif
-
-
-
-config.status: configure
+config.status: configure.ac
 	dh_testdir
-	# Add here commands to configure the package.
 	dh_autoreconf
-	for v in $(PYVERS) $(PY3VERS); do \
-	  CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --with-python=/usr/bin/python$$v $(CONFIGURE_ARGS); \
-	  rm -rf bindings/python$$v; \
-	  cp -a bindings/python bindings/python$$v; \
+	# run configure once per Python3 version, and copy resulting directory
+	# aside
+	set -e; \
+	for v in $(PY3VERS); do \
+		CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) $(CONFIGURE_ARGS) --with-python=/usr/bin/python$$v; \
+		rm -rf bindings/python$$v; \
+		cp -a bindings/python bindings/python$$v; \
 	done
 
-
-build: build-stamp
-build-stamp:  config.status
+build-arch: build-stamp
+build-stamp: config.status
 	dh_testdir
 
-	# Add here commands to compile the package.
 	$(MAKE) V=1
 	set -e; \
-	for v in $(PYVERS) $(PY3VERS); do \
-	  $(MAKE) -C bindings/python$$v clean; \
-	  $(MAKE) -C bindings/python$$v V=1; \
+	for v in $(PY3VERS); do \
+	  $(MAKE) PYTHON=/usr/bin/python$$v -C bindings/python$$v clean; \
+	  $(MAKE) PYTHON=/usr/bin/python$$v -C bindings/python$$v; \
 	done
 
 	touch build-stamp
@@ -96,67 +69,57 @@ build-stamp:  config.status
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
-
-ifeq ($(with_java),yes)
-	sed -e 's/^#JAVA#//' < debian/control.in > debian/control
-else
-	sed -e 's/^#JAVA#.*//' < debian/control.in > debian/control
-endif
-
-ifeq ($(with_php),yes)
-	sed -e 's/^#PHP#//' < debian/control.in > debian/control
-else
-	sed -e 's/^#PHP#.*//' < debian/control.in > debian/control
-endif
+	rm -f build-stamp
 
 
 	[ ! -f Makefile ] || $(MAKE) distclean
 
-	for v in $(PY2VERS) $(PY3VERS); do \
+	for v in $(PY3VERS); do \
 	  rm -rf bindings/python$$v; \
 	done
 
 	rm -f config.log
 	rm -f debian/liblasso-perl.install
+	rm -f ./bindings/perl/MYMETA.json ./bindings/perl/MYMETA.yml
+	rm -rf ./bindings/perl/__pycache__ ./bindings/__pycache__ ./bindings/python/__pycache__
 
 	dh_autoreconf_clean
 	dh_clean
 
-install: build
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
-	# Add here commands to install the package into debian/tmp
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp \
 		GACUTIL="/usr/bin/gacutil -root $(CURDIR)/debian/tmp/usr/lib"
+
+	# install and rename module for all supporter Python 3 versions
 	set -e; \
-	for v in $(PYVERS) $(PY3VERS); do \
+	for v in $(PY3VERS); do \
 	  $(MAKE) -C bindings/python$$v install DESTDIR=$(CURDIR)/debian/tmp; \
+	  PYVER=/usr/bin/python$$v ; \
+	  SUFFIX=$$($$PYVER -c 'import sysconfig; print(sysconfig.get_config_var("EXT_SUFFIX"))') ; \
+	  mv $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/_lasso.so \
+		  $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/_lasso$$SUFFIX ; \
 	done
-
-
-ifeq ($(with_java),yes)
-	mkdir $(CURDIR)/debian/tmp/usr/lib/jni/
-	if [ -e $(CURDIR)/debian/tmp/usr/lib/java ]; then \
-	  mv $(CURDIR)/debian/tmp/usr/lib/java/*.so $(CURDIR)/debian/tmp/usr/lib/jni/ ; \
-	fi
-endif
 
 	sed -e 's,$${archlib},$(ARCHLIB),g' debian/liblasso-perl.install.in > debian/liblasso-perl.install
 
-	# remove id-wsf directory if it is empty
-	-rmdir $(CURDIR)/debian/tmp/usr/include/lasso/id-wsf/
 
+build-indep:
+
+install-indep:
+
+build: build-arch build-indep
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: build-indep install-indep
 	#dh_makeclilibs -L liblasso-cil -r
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: build-arch install-arch
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -164,23 +127,21 @@ binary-arch: build install
 	dh_installexamples -XCVS
 	dh_installman
 	dh_install
+	mkdir $(CURDIR)/debian/liblasso3-dev/usr/lib/$(DEB_HOST_MULTIARCH)
+	mv $(CURDIR)/debian/liblasso3-dev/usr/lib/pkgconfig $(CURDIR)/debian/liblasso3-dev/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig
 	chrpath -d $(CURDIR)/debian/liblasso-perl/$(ARCHLIB)/auto/Lasso/Lasso.so
 	dh_link
 	dh_strip
 	dh_perl
-	dh_python2 -ppython-lasso
 	dh_python3 -ppython3-lasso
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs -a -V
 	dh_installdeb
 	dh_shlibdeps -a
-ifeq ($(with_php),yes)
-	echo "php:Depends=phpapi-`php-config5 --phpapi`" >> $(CURDIR)/debian/php5-lasso.substvars
-endif
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build build-arch install-arch build-indep install-indep clean binary-indep binary-arch binary install

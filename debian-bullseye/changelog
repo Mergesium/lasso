@@ -1,3 +1,91 @@
+lasso (2.7.0-2) unstable; urgency=medium
+
+  * debian/rules: introduce build-arch/build-indep targets.
+  * debian/rules: clean perl META files.
+  * debian/rules: remove cleaning of id-wsf directory, it doesn't exist
+    anymore.
+  * debian/liblasso3.symbols: add lasso_log symbol introduced in 2.7.0-1.
+
+ -- Frederic Peters <fpeters@debian.org>  Sat, 06 Nov 2021 13:42:52 +0100
+
+lasso (2.7.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/patches/: remove, all patches are now upstream.
+
+ -- Frederic Peters <fpeters@debian.org>  Mon, 16 Aug 2021 18:31:12 +0200
+
+lasso (2.6.1-3) unstable; urgency=high
+
+  * debian/patches/0001-Fix-signature-checking-on-unsigned-response-with-mul.patch,
+    taken from upstream repository,
+    * CVE-2021-28091: Signature checking on unsigned response with multiple
+      assertions
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 01 Jun 2021 14:43:55 +0200
+
+lasso (2.6.1-2) unstable; urgency=medium
+
+  * debian/control: add gtk-doc-tools to build-depends, required when running
+    autoreconf against autoconf 2.70. (closes: 978846)
+
+ -- Frederic Peters <fpeters@debian.org>  Thu, 31 Dec 2020 15:41:40 +0100
+
+lasso (2.6.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/patches/: remove, all patches are now upstream.
+
+ -- Frederic Peters <fpeters@debian.org>  Thu, 23 Apr 2020 20:52:51 +0200
+
+lasso (2.6.0-8) unstable; urgency=medium
+
+  * d/p/fix-parsing-of-saml-authncontext.diff: import upstream commit
+    to fix parsing of saml:AuthnContextDecl (closes: #955354)
+
+ -- Frederic Peters <fpeters@debian.org>  Mon, 30 Mar 2020 15:55:54 +0200
+
+lasso (2.6.0-7) unstable; urgency=medium
+
+  * Move lasso.pc to a multiarch location. (patch by Helmut Grohne,
+    thanks, closes: #949989)
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 28 Jan 2020 08:53:34 +0100
+
+lasso (2.6.0-6) unstable; urgency=medium
+
+  * d/control: remove unnecessary python build-dependency (closes: #936817)
+  * d/p/build-without-python2.diff: import upstream commits related to
+    building with Python 3.
+
+ -- Frederic Peters <fpeters@debian.org>  Sun, 19 Jan 2020 10:23:50 +0100
+
+lasso (2.6.0-5) unstable; urgency=medium
+
+  * d/rules: update build/install target to support coinstalling for multiple
+    Python 3 versions (closes: #945123)
+
+ -- Frederic Peters <fpeters@debian.org>  Wed, 20 Nov 2019 11:01:24 +0100
+
+lasso (2.6.0-4) unstable; urgency=medium
+
+  * d/compat: bump to debhelper level 10.
+  * d/control: bump Standards-Version to 4.4, but no switch to "dh" yet.
+  * d/control, d/rules: remove obsolete support for building Java and PHP
+    bindings; this also removes the d/control.in mechanism.
+  * d/control: add explicit python dependency, still required for lasso/*.py
+    build tools. (will be fixed in next upstream tarball)
+  * d/rules: remove PYDEF variable unused with the removal of python-lasso.
+  * d/rules: clean Python 3 __pycache__ directories.
+
+ -- Frederic Peters <fpeters@debian.org>  Thu, 05 Sep 2019 08:03:12 +0200
+
+lasso (2.6.0-3) unstable; urgency=medium
+
+  * d/*: remove python-lasso (closes: #936817)
+
+ -- Frederic Peters <fpeters@debian.org>  Fri, 30 Aug 2019 10:39:11 +0200
+
 lasso (2.6.0-2) unstable; urgency=medium
 
   * d/compat: bump do debhelper level 9.
