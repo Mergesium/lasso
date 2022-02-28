@@ -20,7 +20,7 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'sudo -H -u eobuilder /usr/local/bin/eobuilder lasso'
+                    sh 'sudo -H -u eobuilder /usr/local/bin/eobuilder -d buster,bullseye lasso'
                 }
             }
         }
