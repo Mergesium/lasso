@@ -1,3 +1,959 @@
+2022-03-10  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.8.0
+	https://dev.entrouvert.org/projects/lasso/wiki/Check_List_Nouvelle_Version
+
+2022-02-28  Frédéric Péters  <fpeters@entrouvert.com>
+
+	jenkins: add bullseye to packaging targets
+
+2021-11-20  Frédéric Péters  <fpeters@entrouvert.com>
+
+	debian: sync bullseye packaging with upstream debian.org (#58788)
+
+	debian: init debian-bullseye as a copy of debian buster (#58788)
+
+2021-09-28  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Does not decref boolean constants (#57268)
+	TRUE/FALSE are special references in CPython bindings whose reference
+	count must never be updated.
+
+2021-09-13  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Keep ABI stability (#56883)
+	The following functions where part of the experimental ID-WSF support
+	recently removed but where incorrectly included in the official ABI, so we
+	restore dummy versions of them (they do nothing or return NULL):
+	- lasso_get_prefix_for_dst_service_href
+	- lasso_get_prefix_for_idwsf2_dst_service_href
+	- lasso_register_dst_service
+	- lasso_register_idwsf2_dst_service
+
+2021-09-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	debian: update liblasso3.symbols
+
+2021-09-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Clear Python error indicator after logging (#56572)
+	Lasso log using the GLib logging API and the Python binding install a
+	hook to delegate logging to a Python logger named "lasso".
+
+	During the logging call the error indicator can be set to signal an
+	exception. The indicator will still be set when we return from the Lasso
+	API call, and is not handled by the Python wrapping of the C functions.
+	If our function returns a non-NULL value, the Python interpreter will
+	raise because this situation is forbidden.
+
+	To prevent it, if we detect that an exception occurred during logging
+	calls, we print it to stderr, clear the error indicator and return
+	immediately.
+
+2021-09-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Change default key encryption padding algorithm to RSA-OAEP (#56023)
+	The key encryption padding algorithm is now configurable, the default
+	being changed to OAEP. It's possible to set the default through
+	./configure with:
+
+	    --with-default-key-encryption-method=[rsa-pkcs1|rsa-oaep]
+
+	at initialization time with an environment variable:
+
+	    LASSO_DEFAULT_KEY_ENCRYPTION_METHOD=[rsa-pkcs1|rsa-oaep]
+
+	or at runtime for a service provider:
+
+	    lasso_provider_set_key_encryption_method(LassoProvider *provider,
+	        LassoKeyEncryptionMethod key_encryption_method)
+
+	The setting is global for all encrypted nodes (Assertion or NameID).
+
+2021-09-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Python: fix formatting (#56023)
+
+	Remove win32 directory (#56645)
+	It's obsolete.
+
+	Remove ID-WSF 1.0, 2.0 and WS-* support (#56644)
+	It has been deprecated for a long time.
+
+2021-09-03  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix warning about int conversion
+	    saml2_authn_context.c:77:3: warning: initialization of ‘unsigned int’ from ‘void *’
+	    makes integer from pointer without a cast [-Wint-conversion]
+
+2021-07-16  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Prevent multiple OneTimeUse elements (#52961)
+	"A SAML authority MUST NOT include more than one <OneTimeUse> element within a
+	<Conditions>element of an assertion"
+
+2021-07-13  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	python: clear warnings about PY_SSIZE_T_CLEAN (#55561)
+	Using the python3 bindings on recent python3 >=3.8 versions shows:
+
+	   DeprecationWarning: PY_SSIZE_T_CLEAN will be required for '#' formats
+
+	https://docs.python.org/3.9/whatsnew/changelog.html?highlight=py_ssize_t_clean#id193
+
+2021-07-13  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	python: clear warnings about assertX methods (#55561)
+
+2021-06-24  Jakub Hrozek  <jhrozek@redhat.com>
+
+	test13_test_lasso_server_load_metadata: Don't verify signature if lasso is not configured with sha-1 (#54037)
+
+	python: Skip the DSA key test unless SHA-1 is configured (#54037)
+	lasso supports DSA-XXX only with SHA-1. The alternative is to use
+	DSA-SHA256.
+
+2021-06-24  Jakub Hrozek  <jhrozek@redhat.com>
+
+	Check if the signature method is allowed in addition to being valid (#54037)
+	Adds a new utility function lasso_allowed_signature_method() that checks
+	if the signature method is allowed. Previously, the code would only
+	check if the method was valid.
+
+	This new function is used whenever lasso_validate_signature_method was
+	previously used through lasso_ok_signature_method() which wraps both
+	validate and allowed.
+
+	lasso_allowed_signature_method() is also used on a couple of places,
+	notably lasso_query_verify_helper().
+
+	Related:
+	https://dev.entrouvert.org/issues/54037
+
+2021-06-23  Jakub Hrozek  <jhrozek@redhat.com>
+
+	Mass-replace LASSO_SIGNATURE_METHOD_RSA_SHA1 with lasso_get_default_signature_method() (#54037)
+	This should be backwards-compatible but at the same time use the
+	selected default instead of RSA-SHA1.
+
+	Related:
+	https://dev.entrouvert.org/issues/54037
+
+2021-06-23  Jakub Hrozek  <jhrozek@redhat.com>
+
+	Make the default signature method and the minimal hash strength configurable (#54037)
+	Adds two new configure options:
+	    --with-default-sign-algo
+	    --min-hash-algo
+
+	--with-default-sign-algo sets the default signing algorithm and defaults
+	to rsa-sha1. At the moment, two algorithms are supported: rsa-sha1 and
+	rsa-sha256.
+
+	--min-hash-algo sets the minimum hash algorithm to be accepted. The
+	default is sha1 for backwards compatibility as well.
+
+	Related:
+	https://dev.entrouvert.org/issues/54037
+
+2021-06-23  Jakub Hrozek  <jhrozek@redhat.com>
+
+	tests: Move test08_lasso_key and test07_saml2_query_verify_signature to SHA256 (#54037)
+	These tests use a hardcoded query and private key which makes it
+	unsuitable to make the tests use the configured default digest. Let's
+	just convert them to SHA256 unconditionally.
+
+	Fix lasso_query_sign HMAC other than SHA1 (#54037)
+	The switch clause was using SHA1 digests for all digest types when
+	signing. This obviously breaks verifying the signatures if HMAC-SHAXXX
+	is used and XXX is something else than 1.
+
+2021-06-01  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.7.0
+
+2021-06-01  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix signature checking on unsigned response with multiple assertions
+	CVE-2021-28091 : when AuthnResponse messages are not signed (which is
+	permitted by the specifiation), all assertion's signatures should be
+	checked, but currently after the first signed assertion is checked all
+	following assertions are accepted without checking their signature, and
+	the last one is considered the main assertion.
+
+	This patch :
+	* check signatures from all assertions if the message is not signed,
+	* refuse messages with assertion from different issuers than the one on
+	  the message, to prevent assertion bundling event if they are signed.
+
+2021-04-07  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Jenkinsfile: update name of main branch
+
+2021-03-09  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Python: improve display of warnings in the binding generator
+
+2021-02-26  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	replace deprecated index() by strchr() (#51385)
+
+2021-02-25  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix: new provider reference count is incremented one time too many (#51420)
+
+2021-02-24  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	docs: update gtk-doc-tools integration (#50441)
+	Using reference documentation on https://developer.gnome.org/gtk-doc-manual/stable/index.html.en
+
+	bindings: disable java tests when java is disabled
+
+2021-02-24  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix: python3 bindings (#51249)
+	The __str__ method called itself, resulting in an RecursionError.
+
+	======================================================================
+	ERROR: test14 (__main__.BindingTestCase)
+	----------------------------------------------------------------------
+	Traceback (most recent call last):
+	  File "./binding_tests.py", line 336, in test14
+	    assert isinstance(str(cm.exception), str)
+	  File "../lasso.py", line 69, in __str__
+	    return '<lasso.%s: %s>' % (self.__class__.__name__, self)
+	  File "../lasso.py", line 69, in __str__
+	    return '<lasso.%s: %s>' % (self.__class__.__name__, self)
+	  File "../lasso.py", line 69, in __str__
+	    return '<lasso.%s: %s>' % (self.__class__.__name__, self)
+	  [Previous line repeated 489 more times]
+	  File "../lasso.py", line 68, in __str__
+	    if sys.version_info >= (3,):
+	RecursionError: maximum recursion depth exceeded in comparison
+
+	----------------------------------------------------------------------
+
+2021-02-23  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	configure.ac: disable java bindings
+
+2020-12-26  Frédéric Péters  <fpeters@entrouvert.com>
+
+	build: update to use origin/main
+
+2020-10-12  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	debian: add packaging for debian-buster
+
+	jenkins.sh: build against all available python versions (#44287)
+
+	python: do not leak out_pyvalue if method call protocol is not respected (#44287)
+
+	python: do not raise in valid_seq() (#44287)
+
+	python: return NULL if get_list_of_strings() fails (#44287)
+
+	python: return NULL if get_list_of_pygobject fails (#44287)
+
+	python: return NULL if get_list_of_xml_nodes fails (#44287)
+
+	python: return NULL if set_list_of_pygobject fails (#44287)
+
+	python: return NULL if set_list_of_xml_nodes fails (#44287)
+
+	python: return NULL if set_list_of_strings fails (#44287)
+
+	python: return NULL if set_hashtable_of_strings fails (#44287)
+
+	python: return NULL if set_hashtable_of_pygobject fails (#44287)
+
+	python: free internal string buffer if needed in set_list_of_strings (#44287)
+
+	python: check if hashtable is NULL before deallocatio (#44287)n
+
+	python: add a failure label to method wrappers (#44287)
+	To separate wrapping code from unwinding and error handling code.
+
+	python: add macro for early return (#44287)
+
+	python: remove newline before method call (#44287)
+
+	python: simplify get_logger_object (#44287)
+
+	python: fix warning about discarded const modifier (#44287)
+
+	python: replace exception by warning on logging path (#44287)
+
+	python: use simpler call format to prevent warning about PY_SSIZE_T_CLEAN (#44287)
+
+	python: remove deprecated PyErr_Warn (#44287)
+
+	python: remove unused PyString_Size (#44287)
+
+2020-08-21  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	python: Exception.message was removed in python3 (#45995)
+
+2020-08-14  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	tools: reimplement xmlURIEscapeStr to respect RFC3986 (#45581)
+	Bugfix by Emmanuel Dreyfus.
+
+	License: MIT
+
+2020-08-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	configure.ac: support php7 interpreter on CentOS 8 (#42299)
+
+2020-04-22  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.6.1
+
+	Keep order of SessionIndexes
+
+	Clear SessionIndex when private SessionIndexes is empty (#41950)
+
+2020-03-26  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	misc: clear warnings about class_init signature using coccinelle
+		$ spatch --in-place --sp-file add-second-arg-to-class-init.cocci `git grep -l -C1 ^class_init \*.c`
+		$ sed -i 's/\*unused\>/*unused G_GNUC_UNUSED/' `git grep -l 'void \*unused'`
+
+	tests: fix compilation with check>0.12 (#39101)
+
+2020-03-05  Bernhard M. Wiedemann  <bwiedemann@suse.de>
+
+	Sort input file lists (#40454)
+	so that lasso.py, lasso/types.c and liblasso.so.3.13.0
+	build reproducibly
+	in spite of indeterministic filesystem readdir order.
+	For some reason, lasso/extract_sections.py lasso/extract_symbols.py
+	do not need such patches to get a reproducible openSUSE package.
+
+	See https://reproducible-builds.org/ for why this is good.
+
+	This patch was done while working on reproducible builds for openSUSE.
+
+	License: MIT
+
+2019-09-09  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	debian: disable php7 (#28608)
+
+2019-09-09  Tomohiro "Tomo-p" KATO  <tomop@teamgedoh.net>
+
+	Modify .gitignore for PHP 7 binding (#28608)
+	License: MIT
+
+	Add PHP 7 binding (#28608)
+	License: MIT
+
+2019-09-09  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix tests broken by new DEBUG logs (#12829)
+
+2019-09-06  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Improve error logging during node parsing (#12829)
+
+	Improve configure compatibility (#32425)
+
+	Improve compatibility with Solaris (#32425)
+
+2019-09-05  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix reference count in lasso_server_add_provider2 (fixes #35061)
+	As implemented lasso_server_add_provider2 could not be used as a publik
+	API as it dit not increase the reference count of the LassoProvider
+	object before adding it to the providers hashtable.
+
+	lasso_server_add_provider_helper had to be modified to decrement the
+	reference count of the new LassoProvider object after using
+	lasso_server_add_provider2.
+
+2019-09-05  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix python multi-version builds on jessie and stretch
+	debian/rules supposed that lasso Makefile would always prefer python2 to
+	python3, it's not the case anymore. Also recent python3 improvements to
+	bindings scripts did not work with python 3.5 on jessie (on jessie/3.5
+	default open() encoding is still ASCII not UTF-8 as with the default
+	UTF-8 of later python3 versions).
+
+2019-08-27  Thomas NOEL  <tnoel@entrouvert.com>
+
+	docs/xsltproc: do not use Internet to fetch DTDs, entities or documents (#35590)
+
+2019-07-04  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	fix missing include <strings.h> for index() (fixes #33791)
+	tests/basic_tests.c:2141:7: warning: implicit declaration of function 'index' [-Wimplicit-function-declaration]
+	  qs = index(authnRequestUrl, '?') + 1;
+	       ^~~~~
+	tests/basic_tests.c:2141:7: warning: incompatible implicit declaration of built-in function 'index'
+
+2019-07-03  Dmitrii Shcherbakov  <dmitrii.shcherbakov@canonical.com>
+
+	PAOS: Do not populate "Destination" attribute
+	When ECP profile (saml-ecp-v2.0-cs01) is used with PAOS binding Lasso
+	populates an AuthnRequest with the "Destination" attribute set to
+	AssertionConsumerURL of an SP - this leads to IdP-side errors because
+	the destination attribute in the request does not match the IdP URL.
+
+	The "Destination" attribute is mandatory only for HTTP Redirect and HTTP
+	Post bindings when AuthRequests are signed per saml-bindings-2.0-os
+	(sections 3.4.5.2 and 3.5.5.2). Specifically for PAOS it makes sense to
+	avoid setting that optional attribute because an ECP decides which IdP
+	to use, not the SP.
+
+	Fixes Bug: 34409
+	License: MIT
+
+2019-07-02  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	export symbol lasso_log (#33784)
+	The symbol lasso_log has to be exported, otherwise Solaris run-time linker
+	fails due to an unresolved symbol dependency.
+
+2019-06-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	tests: use self-generated certificate to sign federation metadata file (#33823)
+	Generation procedure :
+
+		openssl genrsa -out rootCA.key 4096
+		openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 99999 -out rootCA.crt
+		openssl genrsa -out lasso.key 2048
+		openssl req -new -sha256 -key lasso.key -subj "/C=FR/CN=Lasso" -out lasso.csr
+		openssl x509 -req -in lasso.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out lasso.crt -days 99999 -sha256
+		openssl pkcs12 -export -inkey lasso.key -password pass: -in lasso.crt -name lasso -out lasso.pkcs12
+		xmlsec1 --sign --output renater.xml --trusted-pem rootCA.crt --pwd "" --pkcs12 lasso.pkcs12 metadata/renater-metadata.xml
+		xmlsec1 --verify --trusted-pem rootCA.crt metadata/renater-metadata.xml
+
+2019-05-23  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Do not ignore WantAuthnRequestSigned value with hint MAYBE (fixes #33354)
+	Bug introduced in commit 394680712.
+
+	Use io.open(encoding=utf8) in extract_symbols/sections.py (fixes #33360)
+
+2019-01-19  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	xml: adapt schema in saml2:AuthnContext (#29340)
+	saml2:AuthnContext XML schema indicate that AuthenticatingAuthority is
+	an optional unbounded list of nodes, but the current Lasso schema only
+	handle an unique element. To prevent Lasso from refusing perfectly legal
+	messages, we add a rule to the Lasso ignoring other nodes after the
+	first one.
+
+2019-01-11  John Dennis  <jdennis@redhat.com>
+
+	Fix ECP signature not found error when only assertion is signed (#26828)
+	With a SAML Authn Response either the message or the assertion
+	contained in the response message or both can be signed. Most IdP's
+	sign the message. This fixes a bug when processing an ECP authn
+	response when only the assertion is signed.
+
+	lasso_saml20_profile_process_soap_response_with_headers() performs a
+	signature check on the SAML message. A signature can also appear on
+	the assertion which is checked by
+	lasso_saml20_login_process_response_status_and_assertion() The problem
+	occurred when the message was not signed and
+	lasso_saml20_profile_process_soap_response_with_headers() returned
+	LASSO_DS_ERROR_SIGNATURE_NOT_FOUND as an error code which is not
+	actually an error because we haven't checked the signature on the
+	assertion yet. We were returning the first
+	LASSO_DS_ERROR_SIGNATURE_NOT_FOUND error when in fact the subsequent
+	signature check in
+	lasso_saml20_login_process_response_status_and_assertion() succeeded.
+
+	The ECP unit tests were enhanced to cover these cases.
+
+	The enhanced unit test revealed a problem in two switch statements
+	operating on the return value of
+	lasso_profile_get_signature_verify_hint() which were missing a case
+	statement for LASSO_PROFILE_SIGNATURE_VERIFY_HINT_FORCE which caused
+	an abort due to an unknown enumeration value.
+
+	Fixes Bug: 26828
+	License: MIT
+
+2018-10-15  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	extract_types.py: force io to use UTF-8 encoding (fixes #27332)
+
+2018-10-14  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	add Jenkinsfile
+
+	xml: fix parsing of saml:AuthnContext (fixes #25640)
+	Decl/DeclRef are alternatives, when matching a Decl we should jump over
+	the DeclRef.
+
+2018-07-24  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Remove -Werror from --enable-debugging (fixes #24771)
+	GCC 8 has better warnings and it breaks the build on platform already
+	using it and wanting debugging symbols.
+
+	Move AC_SUBST declaration for AM_CFLAGS with alike (#24771)
+	Just to reorder things properly in configure.ac.
+
+	Clean python cache when building python3 binding
+	Python3 store .pyc cache in hidden directory __pycache__, distcheck
+	complained that the source directory was not completely clean after a
+	distclean.
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	Configure should search for versioned Python interpreter.
+	Following the guidelines in Python PEP 394 with regards to the python
+	command on UNIX like systems preference should be given to explicitly
+	versioned command interpreter as opposed to unversioned and that an
+	unversioned python command should (but might not) refer to
+	Python2. Also in some environments unversioned Python interpreters
+	(e.g. /usr/bin/python) do not even exist, onlyh their explicitly
+	versioned variants are (e.g. /usr/bin/python2 and /usr/bin/python3).
+
+	Therefore the AC_CHECK_PROGS directive in configure.ac should not rely
+	exclusively on an unversioned Python interpreter as it does not,
+	rather it should search in priority order. First for python3, then for
+	an unversionsed python because some distributions have already moved
+	the default unversioned python to python3, and then finally search for
+	python2. In the scenario where unversioned python is still pointing to
+	python2 it's equivalent to selecting the last prority option of
+	python2, but if unversioned python is pointing to python3 you get
+	instead. The net result is always preferring python3 but gracefully
+	falling back to python2 not matter how the environment exports it's
+	Python.
+
+	If AC_CHECK_PROGS for python does not check for the versioned variants
+	the build fails in environments that only have versioned variants with
+	this error:
+
+	configure: error: Python must be installed to compile lasso
+
+	License: MIT
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	Make more Python scripts compatible with both Py2 and Py3
+	While porting other Python code in the repo to run under Py3 (as well
+	as Py2) it was discovered there were a number of other Python scripts
+	which also needed porting. However these scripts are never invoked
+	during a build so there was no easy way to test the porting work. I
+	assume these scripts are for developers only and/or are
+	historical. Because there was no way for me to test the porting
+	changes on these scripts I did not want to include the changes in the
+	patch for the Py3 porting which fixed scripts that are invoked during
+	the build (the former patch is mandatory, this patch is optional at
+	the moment). I did verify the scripts compile cleanly under both Py2
+	and Py3, however it's possible I missed porting something or the error
+	does not show up until run-time.
+
+	Examples of the required changes are:
+
+	* Replace use of the built-in function file() with open().  file()
+	  does not exist in Py3, open works in both Py2 and Py3.  The code was
+	  also modified to use a file context manager (e.g. with open(xxx) as
+	  f:). This assures open files are properly closed when the code block
+	  using the file goes out of scope. This is a standard modern Python
+	  idiom.
+
+	* Replace all use of the print keyword with the six.print_()
+	  function, which itself is an emulation of Py3's print function. Py3
+	  no longer has a print keyword, only a print() function.
+
+	* The dict methods .keys(), .values(), .items() no longer return a
+	  list in Py3, instead they return a "view" object which is an
+	  iterator whose result is an unordered set. The most notable
+	  consequence is you cannot index the result of these functions like
+	  your could in Py2 (e.g. dict.keys()[0] will raise a run time
+	  exception).
+
+	* Replace use of StringIO.StringIO and cStringIO with
+	  six.StringIO. Py3 no longer has cStringIO and the six variant
+	  handles the correct import.
+
+	* Py3 no longer allows the "except xxx, variable" syntax, where
+	  variable appering after the comma is assigned the exception object,
+	  you must use the "as" keyword to perform the variable assignment
+	  (e.g. execpt xxx as variable)
+
+	* Python PEP 3113 removed tuple parameter unpacking. Therefore you can
+	  no longer define a formal parameter list that contains tuple
+	  notation representing a single parameter that is unpacked into
+	  multiple arguments.
+
+	License: MIT
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	Downcase UTF-8 file encoding name
+	Python and Emacs (and others?) recognize a special directive line in a
+	file that identifies what encoding the file is encoded in. See Python
+	PEP 263. For example:
+
+	The general form of the directive is:
+
+	where xxx is the name of a codec. Python codec names are lower case
+	with underscores used to seperate words.
+
+	In both Python and Emacs one can create aliases for the codecs so you
+	can use an alternate name to refer to the same codec.
+
+	Python is forgiving with respect to case, underscore and
+	hyphens. Python will automatically create an alias for a codec name by
+	downcasing it and replacing hyphens with underscores, thus "UTF-8" is
+	actually an alias for the "utf_8" codec. Unfortunately emacs does not
+	automatically create such aliases, although one can add aliases via a
+	custom initialization file, but doing so requires every user using
+	emacs to edit the files to manually create their own aliases.
+
+	If you try to write a file in emacs with the "UTF-8" codec name it
+	won't recognize it as "utf-8", instead you'll get errors like this:
+
+	  Warning (mule): Invalid coding system ‘UTF-8’ is specified
+	  for the current buffer/file by the :coding tag.
+	  It is highly recommended to fix it before writing to a file.
+
+	and you must force the file to be written by responding to additional
+	propmpts.
+
+	This patch simply downcases the the "UTF-8" codec name to "utf-8" so
+	that both Python and Emacs will accept the codec name.
+
+	License: MIT
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	fix duplicate definition of LogoutTestCase and logoutSuite
+	Commit 6f617027e added a duplicate definition of the LogoutTestCase
+	class containing only 1 test which shaddowed the original
+	LogoutTestCase containing 4 tests. The logoutSuite variable was also
+	shadowed and the allTests variable contained a duplicate of
+	logoutSuite causing the 2nd definition of LogoutTestCase to be run
+	twice.
+
+	Not only were the original 4 tests not being run but the entire unit
+	test in profiles_tests.py was failing under Python3. This is because
+	the unittest code in Py3 deletes a test from it's list of tests to run
+	once it's been run. The second time the logoutSuite was invoked it no
+	longer contained any tests which caused an exception to be raised
+	because there were no tests to be run.
+
+	License: MIT
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	Make Python scripts compatible with both Py2 and Py3
+	During the build if the Python3 interpreter is used a number of
+	scripts will fail because they were never ported from Py2 to Py3. In
+	general we want Python code to be compatible with both Py2 and
+	Py3. This patch brings the scripts up to date with Py3 but retains
+	backwards compatibility with Py2 (specifically Py 2.7, the last Py2
+	release).
+
+	Examples of the required changes are:
+
+	* Replace use of the built-in function file() with open().  file()
+	  does not exist in Py3, open works in both Py2 and Py3.  The code was
+	  also modified to use a file context manager (e.g. with open(xxx) as
+	  f:). This assures open files are properly closed when the code block
+	  using the file goes out of scope. This is a standard modern Python
+	  idiom.
+
+	* Replace all use of the print keyword with the six.print_()
+	  function, which itself is an emulation of Py3's print function. Py3
+	  no longer has a print keyword, only a print() function.
+
+	* The dict methods .keys(), .values(), .items() no longer return a
+	  list in Py3, instead they return a "view" object which is an
+	  iterator whose result is an unordered set. The most notable
+	  consequence is you cannot index the result of these functions like
+	  your could in Py2 (e.g. dict.keys()[0] will raise a run time
+	  exception).
+
+	* Replace use of StringIO.StringIO and cStringIO with
+	  six.StringIO. Py3 no longer has cStringIO and the six variant
+	  handles the correct import.
+
+	* Py3 no longer allows the "except xxx, variable" syntax, where
+	  variable appering after the comma is assigned the exception object,
+	  you must use the "as" keyword to perform the variable assignment
+	  (e.g. execpt xxx as variable)
+
+	Note: the modifications in this patch are the minimum necessary to get
+	the build to run with the Py3 interpreter. There are numerous other
+	Python scripts in the repo which need Py3 porting as well but because
+	they are not invoked during a build they will be updated in a
+	subsequent patch.
+
+	License: MIT
+
+2018-07-24  John Dennis  <jdennis@redhat.com>
+
+	Use python interpreter specified configure script
+	The configure script allows you to specify the python interpreter to
+	use via the --with-python option. There were several places where the
+	python interpreter was implicity invoked without using the specified
+	version. This can create a number of problems in an environment with
+	multiple python versions as is the case during the transition from
+	Python 2 to Python 3. Python 2 is not compatible with Python
+	3. Lasso's Python code is supposed to be compatible with both
+	versions. But during the build and when running the unit tests it is
+	essential the same interpreter be used consistently otherwise you can
+	have problems.
+
+	This patch assures whenever python is invoked it does so via the
+	$(PYTHON) configuration variable.
+
+	What about shebang lines (e.g #/usr/bin/python) at the top of scripts?
+	Python PEP 394 (https://www.python.org/dev/peps/pep-0394/) covers
+	this. Basically it says if a script is compatible only with Py2 the
+	shebang should be #/usr/bin/python2, if only compatible with Py3 the
+	shebang should be #/usr/bin/python3. However, if the script is
+	compatible with both versions it can continue to use the
+	compatible with both Py2 and Py3.
+
+	License: MIT
+
+2018-06-28  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	tools: set output buffer size in lasso_inflate to 20 times the input size (fixes #24853)
+
+	jenkins.sh: add a make clean to prevent previous build to break new ones
+
+	tools: fix segfault in lasso_get_saml_message (fixes #24830)
+	We reuse the "message" local variable but we should not.
+	Also fix a segfault in lasso_xmltextreader_from_message() when getting
+	the length of "message" before checking if it is NULL or not.
+
+2018-06-28  Frédéric Péters  <fpeters@entrouvert.com>
+
+	python: add a classmethod for lasso.profileGetIssuer (#24831)
+
+2018-06-27  Frédéric Péters  <fpeters@entrouvert.com>
+
+	faq: fix references to lasso.profileGetIssuer (#24832)
+
+	debian: sync with debian package (#24595)
+
+2018-06-14  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	website: add news about 2.6.0 release
+
+2018-05-30  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.6.0
+
+	perl/tests: build Makefile.perl before running the tests
+
+2018-05-01  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	deprecate loading PEM formatted public keys in lasso_xmlsec_load_key_info
+	Also ensure work-around bug[1] in libxmlsec 1.2.24 and 1.2.25.
+
+	[1]: https://github.com/lsh123/xmlsec/issues/164
+
+2018-05-01  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	add a pem-public-key runtime flag
+	We want to deprecate support for loading PEM formatted key
+	from ds:KeyValue nodes, before final removal it will have to be activated
+	through a runtime flag (using LASSO_FLAG environment variable).
+
+2018-04-30  John Dennis  <jdennis@redhat.com>
+
+	Replace xmlSecSoap functions with lasso implementations
+	xmlsec has removed support for SOAP. The missing xmlSecSoap* functions
+	and their dependent utiliity functions were added to Lasso following
+	the model of the existing xmlSec implmentations.
+
+	Note: Lasso tried to accommodate both SOAP 1.1 and SOAP 1.2 but SAML2
+	*only* uses SOAP 1.1 thus the SOAP 1.2 support was superfluous and
+	confused matters. Therefire the SOAP 1.2 support was removed.
+
+	The following new functions were added to Lasso to support SOAP:
+
+	* lasso_xml_next_element_node
+	* lasso_xml_get_node_ns_href
+	* lasso_xml_is_element_node
+	* lasso_xml_soap11_get_header
+	* lasso_xml_soap11_get_body
+
+	The following is the mapping from the deprecated xmlSecSoap symbols
+	to the new Lasso symbols:
+
+	xmlSecSoap11Ns -> LASSO_SOAP_ENV_HREF
+	xmlSecGetNextElementNode -> lasso_xml_next_element_node
+	xmlSecGetNodeNsHref -> lasso_xml_get_node_ns_href
+	xmlSecCheckNodeName -> lasso_xml_is_element_node
+	xmlSecSoap11GetHeader -> lasso_xml_soap11_get_header
+	xmlSecSoap11GetBody -> lasso_xml_soap11_get_body
+
+	This patch also extends the automake version support in autogen.sh to the
+	current 1.16 version.
+
+	License: MIT
+
+2018-04-30  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	perl: set DESTDIR and PREFIX at Makefile's creation
+
+2018-04-29  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	perl: force use of the in-tree lasso when running tests (fixes #23276)
+
+	python: route logs for libxml2 and libxmlsec2 to their own logger
+
+2018-04-06  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	add xmlsec_soap.h to Makefile
+
+	java: stop setting a bytecode version target
+
+	tests: prevent crash in glib caused by abort on recursive logging
+	The fail() function from libcheck is doing a longjump() from inside the
+	logging subsystem, preventing the depth counter to be reinitialised to 0.
+	(Seen with g_private_get(&g_log_depth) in a gdb session).
+
+	route logs from libxml2 and libxmlsec through GLib logging
+
+	fix get_issuer and get_in_response_to
+
+	fix warnings
+
+	replace use of <xmlsec/soap.h> which is deprecated (fixes #18771)
+
+2018-02-10  Frédéric Péters  <fpeters@entrouvert.com>
+
+	debian: initialize stretch packaging with a copy of upstream debian (#21772)
+
+2017-09-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	saml-2.0: improve support for free content inside samlp2:Extensions (fixes #18581)
+	Four new accesors:
+
+		lasso_samlp2_extensions_get_any
+		lasso_samlp2_extensions_set_any
+		lasso_samlp2_extensions_get_attributes
+		lasso_samlp2_extensions_set_attributes
+
+	The two new pseudo field are fully supported in the python binding.
+
+		node = lasso.Samlp2Extensions()
+		node.any = '<test>ok</test>'
+		node.attributes = {'{http://entrouvert.org/}attribute1': 'value'}
+		print node.dump()
+
+2017-08-12  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	ignore unknown attributes from the xsi: namespace
+
+	add defined for the XML namespace
+
+	jenkins.sh: add V=1
+
+2016-08-04  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	fix definitions of error, critical and warning macros (fixes #12830)
+	They all log at the DEBUG level instead of their respective levels.
+
+	tests: convert log level as string
+
+2016-06-18  John Dennis  <jdennis@redhat.com>
+
+	Fix ecp test validate_idp_list() (fixes #11421)
+	validate_idp_list was not using the correct list elements when it
+	iterated over the known_sp_provided_idp_entries_supporting_ecp list.
+	It treated them as lists of strings instead of lists of
+	LassoSamlp2IDPEntry.
+
+	License: MIT
+
+2016-06-15  John Dennis  <jdennis@redhat.com>
+
+	enable user supplied CFLAGS
+	CFLAGS is initialized to the empty string in configure.ac, this
+	effectively turned off user supplied values for CFLAGS preventing site
+	specific values from being used. A further complicating factor was of
+	all the user supplied values documented in Automake only CFLAGS was
+	disabled allowing all other user supplied variables to take
+	effect. Some variables must be coordinated (e.g. CFLAGS with LDFLAGS),
+	the fact LDFLAGS was picked up from the environment but CFLAGS was
+	discarded caused build failures due to incompatible combination of
+	compiler and linker options.
+
+	The problem was first introduced in commit: 73d9c98f "Reset CFLAGS
+	when --enable-debugging is used". This patch simply removes hardcoding
+	CFLAGS to the empty string and appends the debug options
+	(--enable-debugging) to the existing CFLAGS.
+
+	Proper use of the variables is described in the Automake documentation
+	in the section "Flag Variables Ordering"
+	https://www.gnu.org/software/automake/manual/html_node/Flag-Variables-Ordering.html
+
+	Although the Automake documentation claims manipulating CFLAGS
+	directly is improper use there are many examples of this in the
+	existing configure.ac, this patch makes no attempt at addressing this
+	issue, rather it makes existing usage consistent. In the particular
+	case of debug flags appending to CFLAGS is probably the only valid
+	solution because the debug flags must appear at the end of the list of
+	flags in order to override earlier flags, CFLAGS always appears last
+	in the Makefile (see above Automake doc).
+
+	License: MIT
+
+2016-04-26  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	do not call xmlSecKeyDuplicate is source key is NULL
+
+2016-03-11  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	fix segfault when parsed node has no namespace (#47)
+	This bug was introduced in commit 8d06806d, the check for a correct namespace on
+	head node of parsed XML fragments does not handle the case where the node has no
+	namespace. Using lasso_equal_namespace() fix this.
+
+2016-03-07  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	check node names in lasso_node_impl_init_from_xml() (fixes #47)
+
+	tests: silence unused variable warning
+
+2016-03-06  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	add docstring on SHA-2 signature method enum
+
+	remove DGME specific commented out code
+
+	add support for C14N 1.1 methods and C14N withComments methods (fixes #4863)
+
+	Choose the Reference transform based on the chosen Signature transform (fixes #10155)
+	i.e. if the signature use SHA2 then use SHA2 of the same strength for digesting
+	references.
+
+2016-02-24  John Dennis  <jdennis@redhat.com>
+
+	add inline implementation of lasso_log
+	lasso_log is a private function of lasso and as such cannot be
+	referenced by the loader.
+
+	This is equivalent to commit e0bda691 in the PHP binding which
+	exhibited the same problem.
+
+	lasso_log is referenced in jobject_to_gobject() because of
+	lasso_assign_gobject macro, which includes the lasso_release_gobject
+	macro which invokes the message macro which expands to lasso_log.
+
+	License: MIT
+
+2016-02-18  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.5.1
+
+	fix warning about INCLUDES directive
+
 2016-02-18  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
 
 	bindings/php5: fix enum getters and setters (fixes #10032)
