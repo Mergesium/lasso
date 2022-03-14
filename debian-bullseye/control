@@ -2,9 +2,8 @@ Source: lasso
 Priority: optional
 Section: libs
 Maintainer: Frederic Peters <fpeters@debian.org>
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper-compat (= 12),
         dh-python,
-        dh-autoreconf,
         gtk-doc-tools,
         libxml2-dev,
         libxslt1-dev,
@@ -16,14 +15,13 @@ Build-Depends: debhelper (>= 9),
         python3-lxml,
         python3-six,
         chrpath
-Standards-Version: 4.4
-X-Python3-Version: >= 3.4
-Homepage: http://lasso.entrouvert.org
+Standards-Version: 4.6.0
+Homepage: https://lasso.entrouvert.org
 
 Package: liblasso3-dev
 Section: libdevel
 Architecture: any
-Depends: liblasso3 (= ${binary:Version}), libxml2-dev, libxmlsec1-dev, libglib2.0-dev
+Depends: liblasso3 (= ${binary:Version}), libxml2-dev, libxmlsec1-dev, libglib2.0-dev, ${misc:Depends}
 Provides: liblasso-dev
 Conflicts: liblasso-dev, liblasso0, liblasso1
 Description: Library for Liberty Alliance and SAML protocols - development kit

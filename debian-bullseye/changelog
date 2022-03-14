@@ -1,3 +1,17 @@
+lasso (2.7.0-3) unstable; urgency=medium
+
+  * d/control, d/compat: switch to debhelper-compat, remove compat file.
+  * d/control: remove ancient X-Python3-Version field.
+  * d/control: update homepage to https.
+  * d/control: add ${misc:Depends} to liblasso3-dev.
+  * d/control: remove useless dh-autoreconf build dependency.
+  * d/control: update standards-version to 4.6.0.
+  * d/php5-lasso.*: remove files for delete PHP package.
+  * d/liblasso-java.*: remove files for deleted Java package.
+  * d/rules: use dh_prep instead of dh_clean -k.
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 08 Mar 2022 08:17:20 +0100
+
 lasso (2.7.0-2) unstable; urgency=medium
 
   * debian/rules: introduce build-arch/build-indep targets.
