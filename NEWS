@@ -1,6 +1,19 @@
 NEWS
 ====
 
+2.8.0 - March 15th 2022
+-----------------------
+
+22 commits, 585 files changed, 2448 insertions, 69478 deletions
+
+* Removal of all win32 and ID-WSF related source code obsoleted a long time ago
+* Improve choice of signature method and of allowed signature method (by Jakub
+* Hrozek <jhrozek@redhat.com>), it's now possible to completely forbid SHA1 for
+  example
+* Change default RSA encryption padding to OAEP
+* Fix: HMAC signature other than SHA1 (jhrozek@redhat.com)
+* Fix: prevent multiple OneTimeUse elements
+
 2.7.0 - June 1st 2021
 ----------------------
 36 commits, 45 files changed, 1945 insertions, 177 deletions
