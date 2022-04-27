@@ -324,42 +324,17 @@ fi
 
 dnl need to change quotes to allow square brackets
 changequote(<<, >>)dnl
-PYTHON_VERSION=`$PYTHON -c 'from distutils import sysconfig ; print(sysconfig.get_config_var("VERSION"))'`
+PYTHON_VERSION=`$PYTHON --version | sed "s/Python //"`
 changequote([, ])dnl
+
+AM_PATH_PYTHON([$PYTHON_VERSION],[languages_available="$languages_available python($PYTHON_VERSION)"
+PY_CFLAGS="`${PYTHON}-config --cflags`"
+AC_SUBST(PY_CFLAGS)],[
+enable_python=no
+])
 
 test "x$PYTHON" != "x" || AC_MSG_ERROR(Python must be installed to compile lasso)
 
-AC_MSG_CHECKING(for Python development files)
-dnl Check if we were be able to extract a good version number.
-if test "X$PYTHON_VERSION" != "X"; then
-    changequote(<<, >>)dnl
-    PYTHON_INC=`$PYTHON -c 'from distutils import sysconfig ; print(sysconfig.get_python_inc())'`
-    PYTHON_LIB=`$PYTHON -c 'from distutils import sysconfig ; print(sysconfig.get_python_lib(1))'`
-    changequote([, ])dnl
-    PYTHON_H=$PYTHON_INC/Python.h
-    if test -f $PYTHON_H; then
-            PY_CFLAGS="-I$PYTHON_INC"
-            PY_MAKEFILE=`$PYTHON -c 'from distutils import sysconfig ; print(sysconfig.get_makefile_filename())'`
-            PY_OTHER_LIBS=`$SED -n -e 's/^LIBS=\(.*\)/\1/p' $PY_MAKEFILE`
-            PY_EXTRA_LIBS="$PY_LOCALMODLIBS $PY_BASEMODLIBS $PY_OTHER_LIBS"
-            dnl this extracts the $libdir out of python lib directory,
-            dnl replacing it by our own.
-            PY_SUFFIX_LIB=`echo $PYTHON_LIB | $SED -e 's/.*python/python/'`
-            PY_SITE_PACKAGES="\${libdir}/$PY_SUFFIX_LIB"
-            AC_SUBST(PYTHON)
-            AC_SUBST(PY_LIB_LOC)
-            AC_SUBST(PY_CFLAGS)
-            AC_SUBST(PY_EXTRA_LIBS)
-            AC_SUBST(PY_DYNLOAD)
-            AC_SUBST(PY_LIB_A)
-            AC_SUBST(PY_SITE_PACKAGES)
-            languages_available="$languages_available python($PYTHON_VERSION)"
-    else
-            enable_python=no
-    fi
-else
-	enable_python=no
-fi
 AM_CONDITIONAL([PYTHON_ENABLED],[test "x$enable_python" = "xyes"])
 AC_MSG_RESULT($enable_python)
 AC_SUBST(PYTHON_VERSION)

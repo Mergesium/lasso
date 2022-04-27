@@ -9,7 +9,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir) \
 	$(SASL_CFLAGS)
 
-pythondir= $(PY_SITE_PACKAGES)
 nodist_python_DATA = lasso.py
 python_LTLIBRARIES = _lasso.la
 
