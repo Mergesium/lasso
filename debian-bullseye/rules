@@ -101,6 +101,9 @@ install-arch: build-arch
 	  $(MAKE) -C bindings/python$$v install DESTDIR=$(CURDIR)/debian/tmp; \
 	  PYVER=/usr/bin/python$$v ; \
 	  SUFFIX=$$($$PYVER -c 'import sysconfig; print(sysconfig.get_config_var("EXT_SUFFIX"))') ; \
+	  PLATLIB=$$(python$$v -m sysconfig | grep "platlib =" | sed 's/.*"\(.*\)"/\1/') ; \
+	  mkdir -p $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/ ; \
+	  cp -R $(CURDIR)/debian/tmp$$PLATLIB/* $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/ ; \
 	  mv $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/_lasso.so \
 		  $(CURDIR)/debian/tmp/usr/lib/python3/dist-packages/_lasso$$SUFFIX ; \
 	done
