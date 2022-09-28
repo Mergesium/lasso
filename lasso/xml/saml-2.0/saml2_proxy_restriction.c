@@ -53,7 +53,7 @@
 static struct XmlSnippet schema_snippets[] = {
 	{ "Audience", SNIPPET_CONTENT,
 		G_STRUCT_OFFSET(LassoSaml2ProxyRestriction, Audience), NULL, NULL, NULL},
-	{ "Count", SNIPPET_CONTENT,
+	{ "Count", SNIPPET_ATTRIBUTE,
 		G_STRUCT_OFFSET(LassoSaml2ProxyRestriction, Count), NULL, NULL, NULL},
 	{NULL, 0, 0, NULL, NULL, NULL}
 };

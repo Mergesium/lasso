@@ -1,6 +1,12 @@
 NEWS
 ====
 
+2.81. - to be release
+---------------------
+
+- fix wrong parsing of Count attribute on saml:ProxyRestriction, thanks to
+  Maxime Besson from Worteks.
+
 2.8.0 - March 15th 2022
 -----------------------
 
