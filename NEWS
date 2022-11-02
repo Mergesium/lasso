@@ -1,11 +1,17 @@
 NEWS
 ====
 
-2.81. - to be release
----------------------
+2.8.1 - February 28th 2023
+--------------------------
 
-- fix wrong parsing of Count attribute on saml:ProxyRestriction, thanks to
+- Major overhaul of OpenSSL API usage by using only the EVP API as the low
+  level API (RSA*, HMAC*) is deprecated.
+- Fix wrong parsing of Count attribute on saml:ProxyRestriction, thanks to
   Maxime Besson from Worteks.
+- Perl: pass LDFLAGS to Makefile.PL
+- Replace use of deprecated xmlSecBase64Decode by xmlSecBase64Decode_ex
+- Fix overwrite of profile.signature_status in lasso_saml20_login_process_response_status_and_assertion
+- Fix lot of GCC warnings
 
 2.8.0 - March 15th 2022
 -----------------------

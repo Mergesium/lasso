@@ -1,7 +1,86 @@
+2023-02-28  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.8.1
+	-·Major·overhaul·of·OpenSSL·API·usage·by·using·only·the·EVP·API·as·the·low¶
+	··level·API·(RSA*,·HMAC*)·is·deprecated.¶
+	-·Fix·wrong·parsing·of·Count·attribute·on·saml:ProxyRestriction,·thanks·to¶
+	··Maxime·Besson·from·Worteks.¶
+	-·Perl:·pass·LDFLAGS·to·Makefile.PL¶
+	-·Replace·use·of·deprecated·xmlSecBase64Decode·by·xmlSecBase64Decode_ex¶
+	-·Fix·overwrite·of·profile.signature_status·in·lasso_saml20_login_process_response_status_and_assertion¶
+	-·Fix·lot·of·GCC·warnings¶
+
+2022-11-23  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	In lasso_saml20_login_process_response_status_and_assertion does not overwirte signature_status with rc which is always at 0 (#54689)
+	We are losing information in this case, like if the response was not
+	signed.
+
+2022-11-23  Jakub Hrozek  <jhrozek@redhat.com>
+
+	In lasso_saml20_login_process_response_status_and_assertion remove dead switch (#54689)
+	In case VERIFY_HINT was set to IGNORE and the login signature was
+	incorrect, lasso_saml20_login_process_response_status_and_assertion
+	would have jumped straight to the cleanup label which just returns the
+	return code.
+
+	Related: https://dev.entrouvert.org/issues/54689
+	License: MIT
+
+2022-11-21  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix unused parameters warnings (#71400)
+
+	Fix all cast-function-type warnings (#71400)
+
+	Fix warning about enum conversion (#71400)
+
+	Fix all warnings in tests (#71400)
+
+	Fix use of wrong enumeration NULL value (#71400)
+	It produced a cast warning.
+
+	Fix warnings about type casts (#71400)
+
+	Replace all use of xmlSecBase64Decode by lasso_base64_decode (#71399)
+
+	Adapt lasso_base64_decode to the deprecation of xmlSecBase64Decode (#71399)
+	We now use the non-deprecated new API (since xmlsec 1.2.35) xmlSecBase64Decode_ex.
+
+	Add new define LASSO_XMLSEC_VERSION_NUMBER allow version check on libxmlsec (#71399)
+
+	Make lasso_inflate output the inflated buffer size (#71399)
+
+	Use OpenSSL EVP API to work around deprecation of low level APIs in OpenSSL 3 (#71313)
+	OpenSSL API is used to sign query-string values in the SAML 2.0 Redirect binding.
+	Other binding only need the libxmlsec API as signature are XML DSIG signatures.
+
+	Prevent loading of default cert file during tests (#71396)
+
+2022-11-20  Frédéric Péters  <fpeters@entrouvert.com>
+
+	debian: sync with upstream packaging changes
+
+	perl: pass $(LDFLAGS) to Makefile.PL (#71393)
+	LDFLAGS is set during the Debian build to pass hardening flags and
+	we want them to be applied to the perl module.
+
+2022-09-28  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Fix parsing of Count attribute of saml:ProxyRestriction (#69673)
+
+2022-04-27  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Revert "Use the AM_PATH_PYTHON macro instead of custom macros"
+	This reverts commit 23d91efac34fed8c338a388449e763e58527b3d3.
+
+	Use the AM_PATH_PYTHON macro instead of custom macros
+
 2022-03-15  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
 
+	website: update for 2.8.0
+
 	Release 2.8.0
-	https://dev.entrouvert.org/projects/lasso/wiki/Check_List_Nouvelle_Version
 
 2022-03-14  Frédéric Péters  <fpeters@entrouvert.com>
 
