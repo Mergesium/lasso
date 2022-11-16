@@ -929,7 +929,7 @@ dispose(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoProfile *profile)
+instance_init(LassoProfile *profile, G_GNUC_UNUSED void *unused)
 {
 	profile->private_data = LASSO_PROFILE_GET_PRIVATE(profile);
 	profile->private_data->dispose_has_run = FALSE;

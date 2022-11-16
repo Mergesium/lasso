@@ -144,7 +144,7 @@ get_xmlNode(LassoNode *node, gboolean lasso_dump)
 /*****************************************************************************/
 
 static void
-instance_init(LassoSaml2Assertion *node)
+instance_init(LassoSaml2Assertion *node, G_GNUC_UNUSED void *unused)
 {
 	node->sign_type = LASSO_SIGNATURE_TYPE_NONE;
 	node->encryption_sym_key_type = LASSO_ENCRYPTION_SYM_KEY_TYPE_DEFAULT;

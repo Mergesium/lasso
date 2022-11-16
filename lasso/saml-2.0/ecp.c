@@ -434,7 +434,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoEcp *ecp)
+instance_init(LassoEcp *ecp, G_GNUC_UNUSED void *unused)
 {
 	ecp->private_data = g_new0(LassoEcpPrivate, 1);
 }

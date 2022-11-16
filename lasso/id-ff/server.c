@@ -426,7 +426,8 @@ get_first_providerID(gchar *key, G_GNUC_UNUSED gpointer value, char **providerID
 }
 
 static gboolean
-get_first_providerID_by_role(G_GNUC_UNUSED gchar *key, gpointer value, LassoProviderRole role) {
+get_first_providerID_by_role(G_GNUC_UNUSED gchar *key, gpointer value, gpointer _role) {
+	LassoProviderRole role = (LassoProviderRole)_role;
 	LassoProvider *provider = (LassoProvider*)value;
 	if (provider->role == role || role == LASSO_PROVIDER_ROLE_ANY) {
 		return TRUE;
@@ -648,7 +649,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoServer *server)
+instance_init(LassoServer *server, G_GNUC_UNUSED void *unused)
 {
 	server->private_data = g_new0(LassoServerPrivate, 1);
 	server->private_data->dispose_has_run = FALSE;

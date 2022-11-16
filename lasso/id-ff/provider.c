@@ -882,7 +882,7 @@ dispose(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoProvider *provider)
+instance_init(LassoProvider *provider, G_GNUC_UNUSED void *unused)
 {
 	provider->role = LASSO_PROVIDER_ROLE_NONE;
 	provider->ProviderID = NULL;

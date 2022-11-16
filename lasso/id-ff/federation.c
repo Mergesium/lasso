@@ -218,7 +218,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoFederation *federation)
+instance_init(LassoFederation *federation, G_GNUC_UNUSED void *unused)
 {
 	federation->private_data = g_new0(LassoFederationPrivate, 1);
 	federation->private_data->dispose_has_run = FALSE;

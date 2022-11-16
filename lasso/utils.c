@@ -121,12 +121,16 @@ lasso_gobject_is_of_type(GObject *a, GType b)
 	return 1;
 }
 
+static int lasso_extract_gtype_from_list_compare_func(const void *a, const void *b) {
+	return lasso_gobject_is_of_type((GObject*)a, (GType)b);
+}
+
 GObject*
 lasso_extract_gtype_from_list(GType type, GList *list)
 {
 	GList *needle;
 
-	needle = g_list_find_custom(list, (gconstpointer)type, (GCompareFunc)lasso_gobject_is_of_type);
+	needle = g_list_find_custom(list, (gconstpointer)type, lasso_extract_gtype_from_list_compare_func);
 	if (needle) {
 		return needle->data;
 	}

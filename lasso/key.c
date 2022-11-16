@@ -51,7 +51,7 @@ static LassoNodeClass *parent_class = NULL;
 /*****************************************************************************/
 
 static void
-instance_init(LassoKey *key)
+instance_init(LassoKey *key, G_GNUC_UNUSED void *unused)
 {
 	key->private_data = LASSO_KEY_GET_PRIVATE(key);
 }

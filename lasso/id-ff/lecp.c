@@ -408,7 +408,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoLecp *lecp)
+instance_init(LassoLecp *lecp, G_GNUC_UNUSED void *unused)
 {
 	lecp->authnRequestEnvelope = NULL;
 	lecp->authnResponseEnvelope = NULL;

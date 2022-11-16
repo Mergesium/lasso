@@ -131,7 +131,7 @@ init_from_xml(LassoNode *node, xmlNode *xmlnode)
 
 
 static void
-instance_init(LassoEcpRequest *node)
+instance_init(LassoEcpRequest *node, G_GNUC_UNUSED void *unused)
 {
 	node->IsPassive = TRUE;
 }

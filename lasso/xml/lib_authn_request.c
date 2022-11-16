@@ -164,7 +164,7 @@ init_from_query(LassoNode *node, char **query_fields)
 /*****************************************************************************/
 
 static void
-instance_init(LassoLibAuthnRequest *node)
+instance_init(LassoLibAuthnRequest *node, G_GNUC_UNUSED void *unused)
 {
 	node->IsPassive = TRUE;
 }

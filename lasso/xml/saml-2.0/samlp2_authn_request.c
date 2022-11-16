@@ -99,7 +99,7 @@ static LassoNodeClass *parent_class = NULL;
 /*****************************************************************************/
 
 static void
-instance_init(LassoSamlp2AuthnRequest *node)
+instance_init(LassoSamlp2AuthnRequest *node, G_GNUC_UNUSED void *unused)
 {
 	node->AssertionConsumerServiceIndex = -1;
 	node->AttributeConsumingServiceIndex = -1;

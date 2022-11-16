@@ -115,7 +115,7 @@ build_query(LassoNode *node)
 /*****************************************************************************/
 
 static void
-instance_init(LassoSamlp2RequestAbstract *node)
+instance_init(LassoSamlp2RequestAbstract *node, G_GNUC_UNUSED void *unused)
 {
 	node->sign_type = LASSO_SIGNATURE_TYPE_NONE;
 }

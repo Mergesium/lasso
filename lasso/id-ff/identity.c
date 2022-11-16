@@ -216,7 +216,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoIdentity *identity)
+instance_init(LassoIdentity *identity, G_GNUC_UNUSED void *unused)
 {
 	identity->private_data = g_new0(LassoIdentityPrivate, 1);
 	identity->private_data->dispose_has_run = FALSE;

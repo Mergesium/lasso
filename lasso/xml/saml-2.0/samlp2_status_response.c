@@ -122,7 +122,7 @@ init_from_query(LassoNode *node, char **query_fields)
 /*****************************************************************************/
 
 static void
-instance_init(LassoSamlp2StatusResponse *node)
+instance_init(LassoSamlp2StatusResponse *node, G_GNUC_UNUSED void *unused)
 {
 	node->sign_type = LASSO_SIGNATURE_TYPE_NONE;
 }

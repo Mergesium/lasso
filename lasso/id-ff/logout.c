@@ -1216,7 +1216,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoLogout *logout)
+instance_init(LassoLogout *logout, G_GNUC_UNUSED void *unused)
 {
 	logout->initial_http_request_method = LASSO_HTTP_METHOD_NONE;
 	logout->private_data = g_new0(LassoLogoutPrivate, 1);

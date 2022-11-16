@@ -78,7 +78,7 @@ static LassoNodeClass *parent_class = NULL;
 /*****************************************************************************/
 
 static void
-instance_init(LassoSaml2KeyInfoConfirmationDataType *saml2_key_info_confirmation_data_type)
+instance_init(LassoSaml2KeyInfoConfirmationDataType *saml2_key_info_confirmation_data_type, G_GNUC_UNUSED void *unused)
 {
 	saml2_key_info_confirmation_data_type->private_data =
 		LASSO_SAML2_KEY_INFO_CONFIRMATION_DATA_TYPE_GET_PRIVATE(

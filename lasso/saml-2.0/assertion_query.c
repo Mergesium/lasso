@@ -537,7 +537,7 @@ finalize(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoAssertionQuery *assertion_query)
+instance_init(LassoAssertionQuery *assertion_query, G_GNUC_UNUSED void *unused)
 {
 	assertion_query->private_data = g_new0(LassoAssertionQueryPrivate, 1);
 }

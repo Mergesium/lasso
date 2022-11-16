@@ -59,7 +59,7 @@ static LassoNodeClass *parent_class = NULL;
 /*****************************************************************************/
 
 static void
-instance_init(LassoDsX509Data *x509_data)
+instance_init(LassoDsX509Data *x509_data, G_GNUC_UNUSED void *unused)
 {
 	x509_data->private_data = LASSO_DS_X509_DATA_GET_PRIVATE(x509_data);
 }

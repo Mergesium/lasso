@@ -87,7 +87,7 @@ static LassoNodeClass *parent_class = NULL;
 /*****************************************************************************/
 
 static void
-instance_init(LassoSamlpResponseAbstract *node)
+instance_init(LassoSamlpResponseAbstract *node, G_GNUC_UNUSED void *unused)
 {
 	node->sign_type = LASSO_SIGNATURE_TYPE_NONE;
 }

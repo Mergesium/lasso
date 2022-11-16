@@ -2453,7 +2453,7 @@ dispose(GObject *object)
 /*****************************************************************************/
 
 static void
-instance_init(LassoLogin *login)
+instance_init(LassoLogin *login, G_GNUC_UNUSED void *unused)
 {
 	login->private_data = LASSO_LOGIN_GET_PRIVATE(login);
 	login->protocolProfile = 0;

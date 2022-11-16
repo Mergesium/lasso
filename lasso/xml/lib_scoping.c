@@ -57,7 +57,7 @@ static struct XmlSnippet schema_snippets[] = {
 /*****************************************************************************/
 
 static void
-instance_init(LassoLibScoping *node)
+instance_init(LassoLibScoping *node, G_GNUC_UNUSED void *unused)
 {
 	node->ProxyCount = -1;
 }
