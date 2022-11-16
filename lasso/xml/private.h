@@ -120,7 +120,7 @@ typedef struct _LassoSignatureContext {
 	xmlSecKey *signature_key;
 } LassoSignatureContext;
 
-#define LASSO_SIGNATURE_CONTEXT_NONE ((LassoSignatureContext){LASSO_SIGNATURE_TYPE_NONE, NULL})
+#define LASSO_SIGNATURE_CONTEXT_NONE ((LassoSignatureContext){LASSO_SIGNATURE_METHOD_NONE, NULL})
 
 #define lasso_assign_signature_context(to, from) \
 	do { \
