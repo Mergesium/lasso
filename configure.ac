@@ -171,6 +171,10 @@ AC_DEFINE_UNQUOTED(LASSO_VERSION_MAJOR, $VERSION_MAJOR, [Major version number])
 AC_DEFINE_UNQUOTED(LASSO_VERSION_MINOR, $VERSION_MINOR, [Minor version number])
 AC_DEFINE_UNQUOTED(LASSO_VERSION_SUBMINOR, $VERSION_RELEASE, [Release version number])
 
+dnl Create an XMLSEC version number for tests
+AC_DEFINE(LASSO_XMLSEC_VERSION_NUMBER, [(((XMLSEC_VERSION_MAJOR * 0x010000) + (XMLSEC_VERSION_MINOR * 0x0100) + (XMLSEC_VERSION_SUBMINOR * 0x01)))], [XMLSEC Version number])
+AH_BOTTOM([#include <xmlsec/version.h>])
+
 dnl Dirty hack in order to have dynamic resource version numbering.
 WINDOWS_VERSION=`echo $VERSION_MAJOR,$VERSION_MINOR,$VERSION_RELEASE,0`
 AC_SUBST(WINDOWS_VERSION)
