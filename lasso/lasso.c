@@ -440,18 +440,18 @@ static void lasso_flag_parse_environment_variable() {
 }
 
 /* Deprecated functions, kept only to maintain the ABI and the SONAME */
-void lasso_register_dst_service(const char *prefix, const char *href)
+void lasso_register_dst_service(G_GNUC_UNUSED const char *prefix, G_GNUC_UNUSED const char *href)
 {
 }
 
-char* lasso_get_prefix_for_dst_service_href(const char *href)
+char* lasso_get_prefix_for_dst_service_href(G_GNUC_UNUSED const char *href)
 {
 	return NULL;
 }
-void lasso_register_idwsf2_dst_service(const gchar *prefix, const gchar *href)
+void lasso_register_idwsf2_dst_service(G_GNUC_UNUSED const gchar *prefix, G_GNUC_UNUSED const gchar *href)
 {
 }
-gchar* lasso_get_prefix_for_idwsf2_dst_service_href(const gchar *href)
+gchar* lasso_get_prefix_for_idwsf2_dst_service_href(G_GNUC_UNUSED const gchar *href)
 {
 	return NULL;
 }
