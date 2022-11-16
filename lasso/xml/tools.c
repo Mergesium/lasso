@@ -70,6 +70,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "../lasso_config.h"
+#include "config.h"
 
 /**
  * SECTION:saml2_utils
@@ -2516,24 +2517,53 @@ cleanup:
 gboolean
 lasso_base64_decode(const char *from, char **buffer, int *buffer_len)
 {
-	size_t len = strlen(from);
-	int ret;
+	int fromlen = 0;
+	xmlChar *out = NULL;
+	xmlSecSize outlen = 0;
+	xmlSecSize decodedlen = 0;
+	int rc = TRUE;
+	int ret = 0;
 
-	/* base64 map 4 bytes to 3 */
-	len = len / 4 + (len % 4 ? 1 : 0);
-	len *= 3;
-	len += 1; /* zero byte */
-	*buffer = g_malloc0(len);
-
-	xmlSecErrorsDefaultCallbackEnableOutput(FALSE);
-	ret = xmlSecBase64Decode(BAD_CAST from, BAD_CAST *buffer, len);
-	xmlSecErrorsDefaultCallbackEnableOutput(TRUE);
-	if (ret <= 0) {
-		lasso_release_string(*buffer);
+	if (! from) {
 		return FALSE;
 	}
-	*buffer_len = ret;
-	return TRUE;
+
+	fromlen = strlen(from);
+
+	/* base64 map 4 bytes to 3 */
+	outlen = fromlen / 4 + (fromlen % 4 ? 1 : 0);
+	outlen *= 3;
+	outlen += 1; /* zero byte */
+	out = g_malloc0(outlen);
+
+#if LASSO_XMLSEC_VERSION_NUMBER >= 0x010223
+	xmlSecErrorsDefaultCallbackEnableOutput(FALSE);
+	ret = xmlSecBase64Decode_ex(BAD_CAST from, out, outlen, &decodedlen);
+	xmlSecErrorsDefaultCallbackEnableOutput(TRUE);
+	if (ret == 0) {
+		out[outlen - 1] = 0;
+		lasso_transfer_string(*buffer, *((char**)&out));
+		*buffer_len = decodedlen;
+	} else {
+		rc = FALSE;
+	}
+#else
+	xmlSecErrorsDefaultCallbackEnableOutput(FALSE);
+	ret = xmlSecBase64Decode(BAD_CAST from, out, outlen);
+	xmlSecErrorsDefaultCallbackEnableOutput(TRUE);
+
+	if (ret >= 0) {
+		out[outlen - 1] = 0;
+		lasso_transfer_string(*buffer, *((char**)&out));
+		*buffer_len = ret;
+	} else {
+		rc = FALSE;
+	}
+#endif
+	if (out) {
+		lasso_release_string(out);
+	}
+	return rc;
 }
 
 /**
