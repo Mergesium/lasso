@@ -125,11 +125,11 @@ START_TEST(test01_saml2_generateServersContextDumps)
 	char *serviceProviderContextDump;
 
 	identityProviderContextDump = generateIdentityProviderContextDump();
-	fail_unless(identityProviderContextDump != NULL,
+	ck_assert_msg(identityProviderContextDump != NULL,
 			"generateIdentityProviderContextDump should not return NULL");
 	g_free(identityProviderContextDump);
 	serviceProviderContextDump = generateServiceProviderContextDump();
-	fail_unless(serviceProviderContextDump != NULL,
+	ck_assert_msg(serviceProviderContextDump != NULL,
 			"generateServiceProviderContextDump should not return NULL");
 	g_free(serviceProviderContextDump);
 }
@@ -159,37 +159,37 @@ START_TEST(test02_saml2_serviceProviderLogin)
 	serviceProviderContextDump = generateServiceProviderContextDump();
 	spContext = lasso_server_new_from_dump(serviceProviderContextDump);
 	spLoginContext = lasso_login_new(spContext);
-	fail_unless(spLoginContext != NULL,
+	ck_assert_msg(spLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	rc = lasso_login_init_authn_request(spLoginContext, "http://idp5/metadata",
 			LASSO_HTTP_METHOD_REDIRECT);
-	fail_unless(rc == 0, "lasso_login_init_authn_request failed");
+	ck_assert_msg(rc == 0, "lasso_login_init_authn_request failed");
 	request = LASSO_SAMLP2_AUTHN_REQUEST(LASSO_PROFILE(spLoginContext)->request);
-	fail_unless(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
+	ck_assert_msg(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
 	request->IsPassive = 0;
 	lasso_assign_string(request->NameIDPolicy->Format, LASSO_SAML2_NAME_IDENTIFIER_FORMAT_PERSISTENT);
 	request->NameIDPolicy->AllowCreate = 1;
 	relayState = "fake[]";
 	lasso_assign_string(LASSO_PROFILE(spLoginContext)->msg_relayState, relayState);
 	rc = lasso_login_build_authn_request_msg(spLoginContext);
-	fail_unless(rc == 0, "lasso_login_build_authn_request_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_authn_request_msg failed");
 	authnRequestUrl = LASSO_PROFILE(spLoginContext)->msg_url;
-	fail_unless(authnRequestUrl != NULL,
+	ck_assert_msg(authnRequestUrl != NULL,
 			"authnRequestUrl shouldn't be NULL");
 	authnRequestQuery = strchr(authnRequestUrl, '?')+1;
-	fail_unless(strlen(authnRequestQuery) > 0,
+	ck_assert_msg(strlen(authnRequestQuery) > 0,
 			"authnRequestQuery shouldn't be an empty string");
 	spLoginDump = lasso_node_dump(LASSO_NODE(spLoginContext));
-	fail_unless(strstr(authnRequestQuery, "RelayState") != NULL,
+	ck_assert_msg(strstr(authnRequestQuery, "RelayState") != NULL,
 			"authnRequestQuery should contain a RelayState parameter");
-	fail_unless(strstr(authnRequestQuery, "fake%5B%5D") != NULL,
+	ck_assert_msg(strstr(authnRequestQuery, "fake%5B%5D") != NULL,
 			"authnRequestQuery RelayState parameter should be encoded");
 
 	/* Identity provider singleSignOn, for a user having no federation. */
 	identityProviderContextDump = generateIdentityProviderContextDump();
 	idpContext = lasso_server_new_from_dump(identityProviderContextDump);
 	idpLoginContext = lasso_login_new(idpContext);
-	fail_unless(idpLoginContext != NULL,
+	ck_assert_msg(idpLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	check_good_rc(lasso_login_process_authn_request_msg(idpLoginContext, authnRequestQuery));
 	check_true(lasso_login_must_authenticate(idpLoginContext));
@@ -221,7 +221,7 @@ START_TEST(test02_saml2_serviceProviderLogin)
 	responseUrl = LASSO_PROFILE(idpLoginContext)->msg_url;
 	check_not_null(responseUrl);
 	responseQuery = strchr(responseUrl, '?')+1;
-	fail_unless(strlen(responseQuery) > 0,
+	ck_assert_msg(strlen(responseQuery) > 0,
 			"responseQuery shouldn't be an empty string");
 	check_not_null(strstr(responseQuery, "RelayState"));
 	check_not_null(strstr(responseQuery, "fake%5B%5D"));
@@ -358,40 +358,40 @@ START_TEST(test03_saml2_serviceProviderLogin)
 	serviceProviderContextDump = generateServiceProviderContextDump();
 	spContext = lasso_server_new_from_dump(serviceProviderContextDump);
 	spLoginContext = lasso_login_new(spContext);
-	fail_unless(spLoginContext != NULL,
+	ck_assert_msg(spLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	rc = lasso_login_init_authn_request(spLoginContext, "http://idp5/metadata",
 			LASSO_HTTP_METHOD_REDIRECT);
-	fail_unless(rc == 0, "lasso_login_init_authn_request failed");
+	ck_assert_msg(rc == 0, "lasso_login_init_authn_request failed");
 	request = LASSO_SAMLP2_AUTHN_REQUEST(LASSO_PROFILE(spLoginContext)->request);
-	fail_unless(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
+	ck_assert_msg(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
 	request->IsPassive = 0;
 	lasso_assign_string(request->NameIDPolicy->Format, LASSO_SAML2_NAME_IDENTIFIER_FORMAT_PERSISTENT);
 	request->NameIDPolicy->AllowCreate = 1;
 	relayState = "fake";
 	lasso_assign_string(LASSO_PROFILE(spLoginContext)->msg_relayState, relayState);
 	rc = lasso_login_build_authn_request_msg(spLoginContext);
-	fail_unless(rc == 0, "lasso_login_build_authn_request_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_authn_request_msg failed");
 	authnRequestUrl = LASSO_PROFILE(spLoginContext)->msg_url;
-	fail_unless(authnRequestUrl != NULL,
+	ck_assert_msg(authnRequestUrl != NULL,
 			"authnRequestUrl shouldn't be NULL");
 	authnRequestQuery = strchr(authnRequestUrl, '?')+1;
-	fail_unless(strlen(authnRequestQuery) > 0,
+	ck_assert_msg(strlen(authnRequestQuery) > 0,
 			"authnRequestRequest shouldn't be an empty string");
 
 	/* Identity provider singleSignOn, for a user having no federation. */
 	identityProviderContextDump = generateIdentityProviderContextDumpMemory();
 	idpContext = lasso_server_new_from_dump(identityProviderContextDump);
 	idpLoginContext = lasso_login_new(idpContext);
-	fail_unless(idpLoginContext != NULL,
+	ck_assert_msg(idpLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	rc = lasso_login_process_authn_request_msg(idpLoginContext, authnRequestQuery);
-	fail_unless(rc == 0, "lasso_login_process_authn_request_msg failed");
-	fail_unless(lasso_login_must_authenticate(idpLoginContext),
+	ck_assert_msg(rc == 0, "lasso_login_process_authn_request_msg failed");
+	ck_assert_msg(lasso_login_must_authenticate(idpLoginContext),
 			"lasso_login_must_authenticate() should be TRUE");
-	fail_unless(idpLoginContext->protocolProfile == LASSO_LOGIN_PROTOCOL_PROFILE_BRWS_ART,
+	ck_assert_msg(idpLoginContext->protocolProfile == LASSO_LOGIN_PROTOCOL_PROFILE_BRWS_ART,
 			"protocoleProfile should be ProfileBrwsArt");
-	fail_unless(! lasso_login_must_ask_for_consent(idpLoginContext),
+	ck_assert_msg(! lasso_login_must_ask_for_consent(idpLoginContext),
 			"lasso_login_must_ask_for_consent() should be FALSE");
 	rc = lasso_login_validate_request_msg(idpLoginContext,
 			1, /* authentication_result */
@@ -405,21 +405,21 @@ START_TEST(test03_saml2_serviceProviderLogin)
 			"FIXME: notBefore",
 			"FIXME: notOnOrAfter");
 	rc = lasso_login_build_artifact_msg(idpLoginContext, LASSO_HTTP_METHOD_ARTIFACT_GET);
-	fail_unless(rc == 0, "lasso_login_build_artifact_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_artifact_msg failed");
 
 	idpIdentityContextDump = lasso_identity_dump(LASSO_PROFILE(idpLoginContext)->identity);
-	fail_unless(idpIdentityContextDump != NULL,
+	ck_assert_msg(idpIdentityContextDump != NULL,
 		    "lasso_identity_dump shouldn't return NULL");
 	idpSessionContextDump = lasso_session_dump(LASSO_PROFILE(idpLoginContext)->session);
-	fail_unless(idpSessionContextDump != NULL,
+	ck_assert_msg(idpSessionContextDump != NULL,
 		    "lasso_session_dump shouldn't return NULL");
 	responseUrl = LASSO_PROFILE(idpLoginContext)->msg_url;
-	fail_unless(responseUrl != NULL, "responseUrl shouldn't be NULL");
+	ck_assert_msg(responseUrl != NULL, "responseUrl shouldn't be NULL");
 	responseQuery = strchr(responseUrl, '?')+1;
-	fail_unless(strlen(responseQuery) > 0,
+	ck_assert_msg(strlen(responseQuery) > 0,
 			"responseQuery shouldn't be an empty string");
 	lasso_assign_string(serviceProviderId, LASSO_PROFILE(idpLoginContext)->remote_providerID);
-	fail_unless(serviceProviderId != NULL,
+	ck_assert_msg(serviceProviderId != NULL,
 		    "lasso_profile_get_remote_providerID shouldn't return NULL");
 
 	/* Service provider assertion consumer */
@@ -431,11 +431,11 @@ START_TEST(test03_saml2_serviceProviderLogin)
 	rc = lasso_login_init_request(spLoginContext,
 			responseQuery,
 			LASSO_HTTP_METHOD_ARTIFACT_GET);
-	fail_unless(rc == 0, "lasso_login_init_request failed");
+	ck_assert_msg(rc == 0, "lasso_login_init_request failed");
 	rc = lasso_login_build_request_msg(spLoginContext);
-	fail_unless(rc == 0, "lasso_login_build_request_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_request_msg failed");
 	soapRequestMsg = LASSO_PROFILE(spLoginContext)->msg_body;
-	fail_unless(soapRequestMsg != NULL, "soapRequestMsg must not be NULL");
+	ck_assert_msg(soapRequestMsg != NULL, "soapRequestMsg must not be NULL");
 
 	/* Identity provider SOAP endpoint */
 	lasso_server_destroy(idpContext);
@@ -445,25 +445,25 @@ START_TEST(test03_saml2_serviceProviderLogin)
 	idpContext = lasso_server_new_from_dump(identityProviderContextDump);
 	idpLoginContext = lasso_login_new_from_dump(idpContext, idpLoginDump);
 	rc = lasso_login_process_request_msg(idpLoginContext, soapRequestMsg);
-	fail_unless(rc == 0, "lasso_login_process_request_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_process_request_msg failed");
 
 	rc = lasso_profile_set_session_from_dump(LASSO_PROFILE(idpLoginContext),
 						 idpSessionContextDump);
-	fail_unless(rc == 0, "lasso_login_set_assertion_from_dump failed");
+	ck_assert_msg(rc == 0, "lasso_login_set_assertion_from_dump failed");
 	rc = lasso_login_build_response_msg(idpLoginContext, serviceProviderId);
-	fail_unless(rc == 0, "lasso_login_build_response_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_response_msg failed");
 	soapResponseMsg =  LASSO_PROFILE(idpLoginContext)->msg_body;
-	fail_unless(soapResponseMsg != NULL, "soapResponseMsg must not be NULL");
+	ck_assert_msg(soapResponseMsg != NULL, "soapResponseMsg must not be NULL");
 
 	/* Service provider assertion consumer (step 2: process SOAP response) */
 	rc = lasso_login_process_response_msg(spLoginContext, soapResponseMsg);
-	fail_unless(rc == 0, "lasso_login_process_response_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_process_response_msg failed");
 	rc = lasso_login_accept_sso(spLoginContext);
-	fail_unless(rc == 0, "lasso_login_accept_sso failed");
-	fail_unless(LASSO_PROFILE(spLoginContext)->identity != NULL,
+	ck_assert_msg(rc == 0, "lasso_login_accept_sso failed");
+	ck_assert_msg(LASSO_PROFILE(spLoginContext)->identity != NULL,
 			"spLoginContext has no identity");
 	spIdentityContextDump = lasso_identity_dump(LASSO_PROFILE(spLoginContext)->identity);
-	fail_unless(spIdentityContextDump != NULL, "lasso_identity_dump failed");
+	ck_assert_msg(spIdentityContextDump != NULL, "lasso_identity_dump failed");
 	spSessionDump = lasso_session_dump(LASSO_PROFILE(spLoginContext)->session);
 
 	g_free(idpLoginDump);
@@ -505,37 +505,37 @@ START_TEST(test04_sso_then_slo_soap)
 	serviceProviderContextDump = generateServiceProviderContextDump();
 	spContext = lasso_server_new_from_dump(serviceProviderContextDump);
 	spLoginContext = lasso_login_new(spContext);
-	fail_unless(spLoginContext != NULL,
+	ck_assert_msg(spLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	rc = lasso_login_init_authn_request(spLoginContext, "http://idp5/metadata",
 			LASSO_HTTP_METHOD_REDIRECT);
-	fail_unless(rc == 0, "lasso_login_init_authn_request failed");
+	ck_assert_msg(rc == 0, "lasso_login_init_authn_request failed");
 	request = LASSO_SAMLP2_AUTHN_REQUEST(LASSO_PROFILE(spLoginContext)->request);
-	fail_unless(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
+	ck_assert_msg(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
 	request->IsPassive = 0;
 	lasso_assign_string(request->NameIDPolicy->Format, LASSO_SAML2_NAME_IDENTIFIER_FORMAT_PERSISTENT);
 	request->NameIDPolicy->AllowCreate = 1;
 	relayState = "fake[]";
 	lasso_assign_string(LASSO_PROFILE(spLoginContext)->msg_relayState, relayState);
 	rc = lasso_login_build_authn_request_msg(spLoginContext);
-	fail_unless(rc == 0, "lasso_login_build_authn_request_msg failed");
+	ck_assert_msg(rc == 0, "lasso_login_build_authn_request_msg failed");
 	authnRequestUrl = LASSO_PROFILE(spLoginContext)->msg_url;
-	fail_unless(authnRequestUrl != NULL,
+	ck_assert_msg(authnRequestUrl != NULL,
 			"authnRequestUrl shouldn't be NULL");
 	authnRequestQuery = strchr(authnRequestUrl, '?')+1;
-	fail_unless(strlen(authnRequestQuery) > 0,
+	ck_assert_msg(strlen(authnRequestQuery) > 0,
 			"authnRequestQuery shouldn't be an empty string");
 	spLoginDump = lasso_node_dump(LASSO_NODE(spLoginContext));
-	fail_unless(strstr(authnRequestQuery, "RelayState") != NULL,
+	ck_assert_msg(strstr(authnRequestQuery, "RelayState") != NULL,
 			"authnRequestQuery should contain a RelayState parameter");
-	fail_unless(strstr(authnRequestQuery, "fake%5B%5D") != NULL,
+	ck_assert_msg(strstr(authnRequestQuery, "fake%5B%5D") != NULL,
 			"authnRequestQuery RelayState parameter should be encoded");
 
 	/* Identity provider singleSignOn, for a user having no federation. */
 	identityProviderContextDump = generateIdentityProviderContextDump();
 	idpContext = lasso_server_new_from_dump(identityProviderContextDump);
 	idpLoginContext = lasso_login_new(idpContext);
-	fail_unless(idpLoginContext != NULL,
+	ck_assert_msg(idpLoginContext != NULL,
 			"lasso_login_new() shouldn't have returned NULL");
 	check_good_rc(lasso_login_process_authn_request_msg(idpLoginContext, authnRequestQuery));
 	check_true(lasso_login_must_authenticate(idpLoginContext));
@@ -567,7 +567,7 @@ START_TEST(test04_sso_then_slo_soap)
 	responseUrl = LASSO_PROFILE(idpLoginContext)->msg_url;
 	check_not_null(responseUrl);
 	responseQuery = strchr(responseUrl, '?')+1;
-	fail_unless(strlen(responseQuery) > 0,
+	ck_assert_msg(strlen(responseQuery) > 0,
 			"responseQuery shouldn't be an empty string");
 	check_not_null(strstr(responseQuery, "RelayState"));
 	check_not_null(strstr(responseQuery, "fake%5B%5D"));
@@ -696,7 +696,7 @@ START_TEST(test05_sso_idp_with_key_rollover)
 			TESTSDATADIR "idp11-multikey-saml2/private-key-1.pem",
 			NULL, /* Secret key to unlock private key */
 			TESTSDATADIR "idp11-multikey-saml2/certificate-1.pem");
-	check_not_null(idpContext1)
+	check_not_null(idpContext1);
 	check_good_rc(lasso_server_add_provider(
 			idpContext1,
 			LASSO_PROVIDER_ROLE_SP,
@@ -709,7 +709,7 @@ START_TEST(test05_sso_idp_with_key_rollover)
 			TESTSDATADIR "idp11-multikey-saml2/private-key-2.pem",
 			NULL, /* Secret key to unlock private key */
 			TESTSDATADIR "idp11-multikey-saml2/certificate-2.pem");
-	check_not_null(idpContext2)
+	check_not_null(idpContext2);
 	check_good_rc(lasso_server_add_provider(
 			idpContext2,
 			LASSO_PROVIDER_ROLE_SP,
@@ -722,7 +722,7 @@ START_TEST(test05_sso_idp_with_key_rollover)
 			TESTSDATADIR "/sp6-saml2/private-key.pem",
 			NULL, /* Secret key to unlock private key */
 			NULL);
-	check_not_null(spContext)
+	check_not_null(spContext);
 	check_good_rc(lasso_server_add_provider(
 			spContext,
 			LASSO_PROVIDER_ROLE_IDP,
@@ -827,7 +827,7 @@ sso_sp_with_key_rollover(LassoServer *idp_context, LassoServer *sp_context)
 	LassoLogin *sp_login_context;
 
 	check_not_null(idp_login_context = lasso_login_new(idp_context));
-	check_not_null(sp_login_context = lasso_login_new(sp_context))
+	check_not_null(sp_login_context = lasso_login_new(sp_context));
 
 	/* Create response */
 	check_good_rc(lasso_login_init_idp_initiated_authn_request(idp_login_context,
@@ -935,7 +935,7 @@ sso_initiated_by_sp(LassoServer *idp_context, LassoServer *sp_context, SsoCallba
 	char *authn_request_query;
 
 	check_not_null(idp_login_context = lasso_login_new(idp_context));
-	check_not_null(sp_login_context = lasso_login_new(sp_context))
+	check_not_null(sp_login_context = lasso_login_new(sp_context));
 
 	/* Create response */
 	check_good_rc(lasso_login_init_authn_request(sp_login_context, NULL, LASSO_HTTP_METHOD_REDIRECT));
@@ -1026,7 +1026,7 @@ sso_initiated_by_sp2(LassoServer *idp_context, LassoServer *sp_context, SsoSetti
 	char *authn_request_query;
 
 	check_not_null(idp_login_context = lasso_login_new(idp_context));
-	check_not_null(sp_login_context = lasso_login_new(sp_context))
+	check_not_null(sp_login_context = lasso_login_new(sp_context));
 
 	/* Create response */
 	check_good_rc(lasso_login_init_authn_request(sp_login_context, NULL, LASSO_HTTP_METHOD_REDIRECT));
@@ -1332,7 +1332,7 @@ void test_ecp(EcpIdpListVariant ecpIDPListVariant,
 
 	/* Set PAOS authn request parameters */
 	request = LASSO_SAMLP2_AUTHN_REQUEST(LASSO_PROFILE(spLoginContext)->request);
-	fail_unless(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
+	ck_assert_msg(LASSO_IS_SAMLP2_AUTHN_REQUEST(request), "request should be authn_request");
 	request->IsPassive = is_passive;
 
 	lasso_assign_string(request->NameIDPolicy->Format, LASSO_SAML2_NAME_IDENTIFIER_FORMAT_PERSISTENT);

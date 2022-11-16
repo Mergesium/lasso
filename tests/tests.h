@@ -25,46 +25,41 @@
 #include "../lasso/lasso_config.h"
 
 #define check_not_null(what) \
-	fail_unless((what) != NULL, "%s:%i: " #what " returned NULL", __func__, __LINE__);
+	ck_assert((what) != NULL)
 
 #define check_null(what) \
-	fail_unless((what) == NULL, "%s:%i: "#what " returned NULL", __func__, __LINE__);
+	ck_assert((what) == NULL)
 
-#define check_true(what) \
-	fail_unless((what), "%s:%i: " #what " is not TRUE", __func__, __LINE__);
+#define check_true(what) ck_assert(what)
 
-#define check_false(what) \
-	fail_unless(! (what), "%s:%i: " #what " is not FALSE", __func__, __LINE__);
+#define check_false(what) ck_assert(! (what))
 
 
-#define check_good_rc(what) \
-{ 	int __rc = (what); \
-	fail_unless(__rc == 0, "%s:%i: " #what " failed, rc = %s(%i)", __func__, __LINE__, lasso_strerror(__rc), __rc); \
-}
+#define check_good_rc(what) do { int __rc = (what); ck_assert_msg(__rc == 0, "rc = %s(%i)", lasso_strerror(__rc), __rc); } while(0)
 
 #define check_bad_rc(what, how) \
 { 	int __rc = (what); \
-	fail_unless(__rc == how, "%s:%i: " #what " is not %s(%i), rc = %s(%i)", __func__, __LINE__, lasso_strerror(how), how, lasso_strerror(__rc), __rc); \
+	ck_assert_msg(__rc == how, #what " is not %s(%i), rc = %s(%i)", lasso_strerror(how), how, lasso_strerror(__rc), __rc); \
 }
 
 #define check_equals(what,to) \
 {	typeof(what) __tmp1, __tmp2; \
 	__tmp1 = (what); \
 	__tmp2 = (to); \
-	fail_unless(__tmp1 == __tmp2, "%s:%i: " #what " is not equal to " #to "(%llu) but to %llu", __func__, __LINE__, (long long int)__tmp2, (long long int)__tmp1); \
+	ck_assert_msg(__tmp1 == __tmp2, #what " is not equal to " #to "(%llu) but to %llu", (long long int)__tmp2, (long long int)__tmp1); \
 }
 
 #define check_not_equals(what,to) \
 {	typeof(what) __tmp1, __tmp2; \
 	__tmp1 = (what); \
 	__tmp2 = (to); \
-	fail_unless(__tmp1 != __tmp2, "%s:%i: " #what " is equal to " #to "(%llu)", __func__, __LINE__, (long long int)__tmp2); \
+	ck_assert_msg(__tmp1 != __tmp2, #what " is equal to " #to "(%llu)", (long long int)__tmp2); \
 }
 
 #define check_str_equals(what, to) \
 {	typeof(what) __tmp; \
 	__tmp = (what); \
-	fail_unless(g_strcmp0(__tmp, to) == 0, "%s:%i: " #what " (%s) is not equal to %s", __func__, __LINE__, __tmp, to); \
+	ck_assert_msg(g_strcmp0(__tmp, to) == 0, #what " (%s) is not equal to %s", __tmp, to); \
 }
 
 #define check_str_not_equals(what, to) \
@@ -151,7 +146,7 @@ static inline void begin_check_do_log(char *domain, GLogLevelFlags level, const 
 static inline void end_check_do_log(const char *domain) {
 	g_log_remove_handler(domain ? domain : LASSO_LOG_DOMAIN, checking_log_handler);
 	checking_log_handler = 0;
-	fail_unless(checking_log_handler_flag, "Logging failure: expected log level %d and message «%s», got %d and «%s»",
+	ck_assert_msg(checking_log_handler_flag, "Logging failure: expected log level %d and message «%s», got %d and «%s»",
 			checking_logger_user_data.log_levels[0],
 			checking_logger_user_data.messages[0],
 			checking_logger_user_data.log_level_found,

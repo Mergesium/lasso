@@ -14,6 +14,7 @@ AM_CPPFLAGS = \
 	-DTESTSMETADATADIR=\"$(srcdir)/data/metadata/\" \
 	$(LASSO_CFLAGS) \
 	$(CHECK_CFLAGS)
+	-Werror -Wall
 
 
 tests_SOURCES = tests.c login_tests.c basic_tests.c non_regression_tests.c random_tests.c metadata_tests.c login_tests_saml2.c assertion_query_saml2.c

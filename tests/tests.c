@@ -66,7 +66,7 @@ void set_mute_logger() {
      g_log_set_default_handler(mute_logger, NULL);
      if (log_failed) {
          log_failed = 0;
-         fail("There were logs, there should not");
+         ck_assert_msg(0, "There were logs, there should not");
      }
 }
 
@@ -102,7 +102,7 @@ fail_logger(const gchar *log_domain G_GNUC_UNUSED, GLogLevelFlags log_level,
 			g_assert_not_reached();
 	}
         if (! dontfork) {
-		fail("No logging output expected: message «%s» was emitted for domain «%s» at the level «%s»", message, log_domain, level_name);
+		ck_assert_msg(0, "No logging output expected: message «%s» was emitted for domain «%s» at the level «%s»", message, log_domain, level_name);
 	}
 	printf("No logging output expected: message «%s» was emitted for domain «%s» at the level «%s»", message, log_domain, level_name);
         log_failed = 1;
@@ -119,7 +119,7 @@ my_malloc(size_t size)
 {
 	void *ptr = malloc_func(size);
 	if (! ptr) {
-		fail("xmlMalloc failed");
+		ck_assert_msg(0, "xmlMalloc failed");
 	}
 	return ptr;
 }
@@ -129,7 +129,7 @@ my_realloc(void *mem, size_t size)
 {
 	void *ptr = realloc_func(mem, size);
 	if (! ptr) {
-		fail("xmlRealloc failed");
+		ck_assert_msg(0, "xmlRealloc failed");
 	}
 	return ptr;
 }

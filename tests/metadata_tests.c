@@ -43,7 +43,7 @@ START_TEST(test01_metadata_load_der_certificate_from_x509_cert)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_01.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load DER certificate from <ds:X509Certificate>");
+	ck_assert_msg(provider != NULL, "Can't load DER certificate from <ds:X509Certificate>");
 	g_object_unref(provider);
 }
 END_TEST
@@ -52,7 +52,7 @@ START_TEST(test02_metadata_load_pem_certificate_from_x509_cert)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_02.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load PEM certificate from <ds:X509Certificate>");
+	ck_assert_msg(provider != NULL, "Can't load PEM certificate from <ds:X509Certificate>");
 	g_object_unref(provider);
 }
 END_TEST
@@ -61,7 +61,7 @@ START_TEST(test03_metadata_load_der_public_key_from_keyvalue)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_03.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load DER public key from <ds:KeyValue>");
+	ck_assert_msg(provider != NULL, "Can't load DER public key from <ds:KeyValue>");
 	g_object_unref(provider);
 }
 END_TEST
@@ -70,7 +70,7 @@ START_TEST(test04_metadata_load_pem_public_key_from_keyvalue)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_04.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load PEM public key from <ds:KeyValue>");
+	ck_assert_msg(provider != NULL, "Can't load PEM public key from <ds:KeyValue>");
 	g_object_unref(provider);
 }
 END_TEST
@@ -79,7 +79,7 @@ START_TEST(test05_metadata_load_public_key_from_x509_cert)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_05.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load DER public key from <ds:X509Certificate>");
+	ck_assert_msg(provider != NULL, "Can't load DER public key from <ds:X509Certificate>");
 	g_object_unref(provider);
 }
 END_TEST
@@ -88,7 +88,7 @@ START_TEST(test06_metadata_load_public_key_from_rsa_keyvalue)
 {
 	LassoProvider *provider = lasso_provider_new(LASSO_PROVIDER_ROLE_SP,
 			TESTSMETADATADIR "/metadata_06.xml", NULL, NULL);
-	fail_unless(provider != NULL, "Can't load RSAKeyValue node");
+	ck_assert_msg(provider != NULL, "Can't load RSAKeyValue node");
 	g_object_unref(provider);
 }
 END_TEST
@@ -116,7 +116,7 @@ START_TEST(test07_metadata_role_descriptors)
 			LASSO_SAML2_METADATA_ATTRIBUTE_WANT_AUTHN_REQUEST_SIGNED);
 	check_not_null(l);
 	check_null(l->next);
-	check_str_equals(l->data, "true");
+	check_str_equals((char*)l->data, "true");
 	lasso_release_gobject(provider);
 }
 END_TEST

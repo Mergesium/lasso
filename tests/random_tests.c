@@ -46,10 +46,10 @@ START_TEST(test01_provider_new)
 			TESTSDATADIR "/sp1-la/metadata.xml",
 			TESTSDATADIR "/sp1-la/public-key.pem",
 			TESTSDATADIR "/ca1-la/certificate.pem");
-	fail_unless(LASSO_IS_PROVIDER(provider));
+	ck_assert(LASSO_IS_PROVIDER(provider));
 
 	dump = lasso_node_dump(LASSO_NODE(provider));
-	fail_unless(dump != NULL);
+	ck_assert(dump != NULL);
 	g_object_unref(provider);
 	lasso_release_string(dump);
 }
@@ -64,15 +64,15 @@ START_TEST(test02_provider_new_from_dump)
 			TESTSDATADIR "/sp1-la/metadata.xml",
 			TESTSDATADIR "/sp1-la/public-key.pem",
 			TESTSDATADIR "/ca1-la/certificate.pem");
-	fail_unless(LASSO_IS_PROVIDER(provider1));
+	ck_assert(LASSO_IS_PROVIDER(provider1));
 
 	dump = lasso_node_dump(LASSO_NODE(provider1));
-	fail_unless(dump != NULL);
+	ck_assert(dump != NULL);
 	provider2 = lasso_provider_new_from_dump(dump);
-	fail_unless(LASSO_IS_PROVIDER(provider2));
+	ck_assert(LASSO_IS_PROVIDER(provider2));
 	lasso_release_string(dump);
 	dump = lasso_node_dump(LASSO_NODE(provider2));
-	fail_unless(dump != NULL);
+	ck_assert(dump != NULL);
 	g_object_unref(provider1);
 	g_object_unref(provider2);
 	lasso_release_string(dump);
@@ -92,37 +92,37 @@ START_TEST(test01_server_new)
 			TESTSDATADIR "/idp1-la/private-key-raw.pem",
 			NULL, /* Secret key to unlock private key */
 			TESTSDATADIR "/idp1-la/certificate.pem");
-	fail_unless(LASSO_IS_SERVER(server));
+	ck_assert(LASSO_IS_SERVER(server));
 	provider = LASSO_PROVIDER(server);
-	fail_unless(server->private_key != NULL);
-	fail_unless(server->private_key_password == NULL);
-	fail_unless(server->certificate != NULL);
-	fail_unless(server->signature_method == lasso_get_default_signature_method());
-	fail_unless(provider->ProviderID != NULL);
-	fail_unless(provider->role == 0);
-	fail_unless(g_file_get_contents(TESTSDATADIR "/idp1-la/metadata.xml", &content, &len, NULL));
-	fail_unless(strcmp(provider->metadata_filename, content) == 0);
+	ck_assert(server->private_key != NULL);
+	ck_assert(server->private_key_password == NULL);
+	ck_assert(server->certificate != NULL);
+	ck_assert(server->signature_method == lasso_get_default_signature_method());
+	ck_assert(provider->ProviderID != NULL);
+	ck_assert(provider->role == 0);
+	ck_assert(g_file_get_contents(TESTSDATADIR "/idp1-la/metadata.xml", &content, &len, NULL));
+	ck_assert(strcmp(provider->metadata_filename, content) == 0);
 	g_free(content);
-	fail_unless(provider->public_key == NULL);
-	fail_unless(provider->ca_cert_chain == NULL);
+	ck_assert(provider->public_key == NULL);
+	ck_assert(provider->ca_cert_chain == NULL);
 
 	dump = lasso_node_dump(LASSO_NODE(server));
-	fail_unless(dump != NULL);
+	ck_assert(dump != NULL);
 	g_object_unref(server);
 	server = lasso_server_new_from_dump(dump);
-	fail_unless(LASSO_IS_SERVER(server));
+	ck_assert(LASSO_IS_SERVER(server));
 	provider = LASSO_PROVIDER(server);
-	fail_unless(server->private_key != NULL);
-	fail_unless(server->private_key_password == NULL);
-	fail_unless(server->certificate != NULL);
-	fail_unless(server->signature_method == lasso_get_default_signature_method());
-	fail_unless(server->providers != NULL);
-	fail_unless(provider->ProviderID != NULL);
-	fail_unless(provider->role == 0, "provider->role != 0 => provider :=  %d", provider->role);
-	fail_unless(g_file_get_contents(TESTSDATADIR "/idp1-la/metadata.xml", &content, &len, NULL));
-	fail_unless(strcmp(provider->metadata_filename, content) == 0);
-	fail_unless(provider->public_key == NULL);
-	fail_unless(provider->ca_cert_chain == NULL);
+	ck_assert(server->private_key != NULL);
+	ck_assert(server->private_key_password == NULL);
+	ck_assert(server->certificate != NULL);
+	ck_assert(server->signature_method == lasso_get_default_signature_method());
+	ck_assert(server->providers != NULL);
+	ck_assert(provider->ProviderID != NULL);
+	ck_assert_msg(provider->role == 0, "provider->role != 0 => provider :=  %d", provider->role);
+	ck_assert(g_file_get_contents(TESTSDATADIR "/idp1-la/metadata.xml", &content, &len, NULL));
+	ck_assert(strcmp(provider->metadata_filename, content) == 0);
+	ck_assert(provider->public_key == NULL);
+	ck_assert(provider->ca_cert_chain == NULL);
 	g_object_unref(server);
 	lasso_release_string(dump);
 	lasso_release_string(content);
@@ -139,19 +139,19 @@ START_TEST(test02_server_add_provider)
 			TESTSDATADIR "/idp1-la/private-key-raw.pem",
 			NULL, /* Secret key to unlock private key */
 			TESTSDATADIR "/idp1-la/certificate.pem");
-	fail_unless(LASSO_IS_SERVER(server));
-	fail_unless(server->private_key != NULL);
-	fail_unless(! server->private_key_password);
-	fail_unless(server->certificate != NULL);
-	fail_unless(server->signature_method == lasso_get_default_signature_method());
-	fail_unless(server->providers != NULL);
+	ck_assert(LASSO_IS_SERVER(server));
+	ck_assert(server->private_key != NULL);
+	ck_assert(! server->private_key_password);
+	ck_assert(server->certificate != NULL);
+	ck_assert(server->signature_method == lasso_get_default_signature_method());
+	ck_assert(server->providers != NULL);
 	lasso_server_add_provider(
 			server,
 			LASSO_PROVIDER_ROLE_SP,
 			TESTSDATADIR "/sp1-la/metadata.xml",
 			TESTSDATADIR "/sp1-la/public-key.pem",
 			TESTSDATADIR "/ca1-la/certificate.pem");
-	fail_unless(g_hash_table_size(server->providers) == 1);
+	ck_assert(g_hash_table_size(server->providers) == 1);
 
 
 	dump = lasso_node_dump(LASSO_NODE(server));
@@ -206,9 +206,9 @@ START_TEST(test04_node_new_from_dump)
 	char *dump;
 
 	node = lasso_node_new_from_dump(msg);
-	fail_unless(node != NULL, "new_from_dump failed");
+	ck_assert_msg(node != NULL, "new_from_dump failed");
 	dump = lasso_node_dump(node);
-	fail_unless(dump != NULL, "node_dump failed");
+	ck_assert_msg(dump != NULL, "node_dump failed");
 	g_object_unref(node);
 	g_free(dump);
 }
@@ -241,11 +241,11 @@ START_TEST(test05_xsi_type)
 	stmt->AuthnContext->AuthnContextClassRef = g_strdup("urn:toto");
 
 	dump = lasso_node_dump(LASSO_NODE(assertion));
-	fail_unless(strstr(dump, "xsi:type=\"lib:AuthnContextType\"") == NULL,
+	ck_assert_msg(strstr(dump, "xsi:type=\"lib:AuthnContextType\"") == NULL,
 			"AuthnContext got a xsi:type");
 	g_free(dump);
 	dump = lasso_node_dump(LASSO_NODE(assertion));
-	fail_unless(strstr(dump, "xsi:type=\"lib:AuthenticationStatementType\"") != NULL,
+	ck_assert_msg(strstr(dump, "xsi:type=\"lib:AuthenticationStatementType\"") != NULL,
 			"AuthenticationStatement didn't get a xsi:type");
 	g_free(dump);
 	g_object_unref(assertion);
@@ -262,7 +262,7 @@ START_TEST(test06_lib_statuscode)
 
 	lasso_assign_string(response->Status->StatusCode->Value, LASSO_SAML_STATUS_CODE_SUCCESS);
 	dump = lasso_node_dump(LASSO_NODE(response));
-	fail_unless(strstr(dump, "xmlns:lib=") == NULL,
+	ck_assert_msg(strstr(dump, "xmlns:lib=") == NULL,
 			"liberty namespace should not be defined");
 	lasso_release_string(dump);
 
@@ -271,7 +271,7 @@ START_TEST(test06_lib_statuscode)
 	response->Status->StatusCode->StatusCode->Value = g_strdup(
 			LASSO_LIB_STATUS_CODE_UNKNOWN_PRINCIPAL);
 	dump = lasso_node_dump(LASSO_NODE(response));
-	fail_unless(strstr(dump, "xmlns:lib=") != NULL,
+	ck_assert_msg(strstr(dump, "xmlns:lib=") != NULL,
 			"liberty namespace should be defined");
 	lasso_release_string(dump);
 	g_object_unref(response);
@@ -319,11 +319,11 @@ LlTxKnCrWAXftSm1rNtewTsF\n\
 	xmlSecKeyPtr key = lasso_xmlsec_load_private_key_from_buffer(pkey, sizeof(pkey)-1, NULL,
 			LASSO_SIGNATURE_METHOD_RSA_SHA256, NULL);
 
-	fail_unless(key != NULL, "Cannot load public key");
-	fail_unless(lasso_saml2_query_verify_signature(query1, key) == 0, "Signature was not validated");
+	ck_assert_msg(key != NULL, "Cannot load public key");
+	ck_assert_msg(lasso_saml2_query_verify_signature(query1, key) == 0, "Signature was not validated");
 	/* test reordering and semi-colon separator support */
-	fail_unless(lasso_saml2_query_verify_signature(query2, key) == 0, "Disordered signature was not validated");
-	fail_unless(lasso_saml2_query_verify_signature(query3, key) != 0, "Altered signature was validated");
+	ck_assert_msg(lasso_saml2_query_verify_signature(query2, key) == 0, "Disordered signature was not validated");
+	ck_assert_msg(lasso_saml2_query_verify_signature(query3, key) != 0, "Altered signature was validated");
 	xmlSecKeyDestroy(key);
 }
 END_TEST
@@ -405,21 +405,21 @@ AQAB\n\
 	xmlDoc *doc;
 
 	doc = xmlParseDoc(BAD_CAST message);
-	fail_unless(key != NULL, "Cannot load public key");
-	fail_unless(lasso_key_query_verify(key, query1) == 0, "Signature was not validated");
+	ck_assert_msg(key != NULL, "Cannot load public key");
+	ck_assert_msg(lasso_key_query_verify(key, query1) == 0, "Signature was not validated");
 	/* test reordering and semi-colon separator support */
-	fail_unless(lasso_key_query_verify(key, query2) == 0, "Disordered signature was not validated");
-	fail_unless(lasso_key_query_verify(key, query3) != 0, "Altered signature was validated");
-	fail_unless(lasso_key_saml2_xml_verify(key,
+	ck_assert_msg(lasso_key_query_verify(key, query2) == 0, "Disordered signature was not validated");
+	ck_assert_msg(lasso_key_query_verify(key, query3) != 0, "Altered signature was validated");
+	ck_assert_msg(lasso_key_saml2_xml_verify(key,
 		"_5E4DB038BC15C020CE085F743D485443", xmlDocGetRootElement(doc)) == 0,
 		"XML Signature is not validated");
 	g_object_unref(key);
-	fail_unless(key2 != NULL, "Cannot load public key2");
-	fail_unless(lasso_key_query_verify(key2, query1) == 0, "Signature was not validated");
+	ck_assert_msg(key2 != NULL, "Cannot load public key2");
+	ck_assert_msg(lasso_key_query_verify(key2, query1) == 0, "Signature was not validated");
 	/* test reordering and semi-colon separator support */
-	fail_unless(lasso_key_query_verify(key2, query2) == 0, "Disordered signature was not validated");
-	fail_unless(lasso_key_query_verify(key2, query3) != 0, "Altered signature was validated");
-	fail_unless(lasso_key_saml2_xml_verify(key2,
+	ck_assert_msg(lasso_key_query_verify(key2, query2) == 0, "Disordered signature was not validated");
+	ck_assert_msg(lasso_key_query_verify(key2, query3) != 0, "Altered signature was validated");
+	ck_assert_msg(lasso_key_saml2_xml_verify(key2,
 		"_5E4DB038BC15C020CE085F743D485443", xmlDocGetRootElement(doc)) == 0,
 		"XML Signature is not validated");
 	g_object_unref(key2);
