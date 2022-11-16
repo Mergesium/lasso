@@ -2578,10 +2578,10 @@ lasso_xmlURIEscapeStr(const xmlChar *from, const xmlChar *list)
 	int ri;
 
 	if (list == NULL)
-		list = "";
+		list = (xmlChar*)"";
 
 	for (fp = from; *fp; fp++) {
-		if (isalnum(*fp) || strchr("._~-", *fp) || strchr(list, *fp))
+		if (isalnum(*fp) || strchr("._~-", *fp) || strchr((char*)list, *fp))
 			len++;
 		else
 			len += 3;
@@ -2591,7 +2591,7 @@ lasso_xmlURIEscapeStr(const xmlChar *from, const xmlChar *list)
 	ri = 0;
 
 	for (fp = from; *fp; fp++) {
-		if (isalnum(*fp) || strchr("._~-", *fp) || strchr(list, *fp)) {
+		if (isalnum(*fp) || strchr("._~-", *fp) || strchr((char*)list, *fp)) {
 			result[ri++] = *fp;
 		} else {
 			int msb = (*fp & 0xf0) >> 4;
