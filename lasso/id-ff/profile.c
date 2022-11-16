@@ -667,7 +667,7 @@ LassoProfileSignatureVerifyHint
 lasso_profile_get_signature_verify_hint(LassoProfile *profile)
 {
 	if (! LASSO_IS_PROFILE(profile) || ! profile->private_data)
-		return LASSO_PROFILE_SIGNATURE_HINT_MAYBE;
+		return LASSO_PROFILE_SIGNATURE_VERIFY_HINT_MAYBE;
 	return profile->private_data->signature_verify_hint;
 }
 
