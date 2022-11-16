@@ -1357,17 +1357,19 @@ lasso_get_query_string_param_value(const char *qs, const char *param_key, const 
 }
 
 unsigned char*
-lasso_inflate(unsigned char *input, size_t len)
+lasso_inflate(unsigned char *input, size_t len, size_t *outlen)
 {
 	z_stream zstr;
 	unsigned char *output;
 	int z_err;
 
+	*outlen = 0;
 	zstr.zalloc = NULL;
 	zstr.zfree = NULL;
 	zstr.opaque = NULL;
 
-	output = g_malloc(len*20);
+	// add one to account for the zero byte
+	output = g_malloc(len*20+1);
 	zstr.avail_in = len;
 	zstr.next_in = (unsigned char*)input;
 	zstr.total_in = 0;
@@ -1391,6 +1393,7 @@ lasso_inflate(unsigned char *input, size_t len)
 	}
 	output[zstr.total_out] = 0;
 	inflateEnd(&zstr);
+	*outlen = zstr.total_out;
 
 	return output;
 }
@@ -1400,6 +1403,7 @@ gboolean
 lasso_node_init_from_deflated_query_part(LassoNode *node, char *deflate_string)
 {
 	int len;
+	size_t outlen = 0;
 	xmlChar *b64_zre, *zre, *re;
 	xmlDoc *doc;
 	xmlNode *root;
@@ -1415,13 +1419,13 @@ lasso_node_init_from_deflated_query_part(LassoNode *node, char *deflate_string)
 		return FALSE;
 	}
 
-	re = lasso_inflate(zre, len);
+	re = lasso_inflate(zre, len, &outlen);
 	xmlFree(zre);
 
 	if (! re)
 		return FALSE;
 
-	doc = lasso_xml_parse_memory((char*)re, strlen((char*)re));
+	doc = lasso_xml_parse_memory((char*)re, outlen);
 	lasso_release_string(re);
 
 	root = xmlDocGetRootElement(doc);
@@ -3166,6 +3170,7 @@ lasso_get_saml_message(xmlChar **query_fields) {
 	char *t = NULL;
 	int rc = 0;
 	int len = 0;
+	size_t outlen = 0;
 
 	for (i=0; (field=query_fields[i]); i++) {
 		t = strchr((char*)field, '=');
@@ -3201,7 +3206,7 @@ lasso_get_saml_message(xmlChar **query_fields) {
 		goto cleanup;
 	}
 	/* rc contains the length of the result */
-	saml_message = (char*)lasso_inflate((unsigned char*) decoded_message, rc);
+	saml_message = (char*)lasso_inflate((unsigned char*) decoded_message, rc, &outlen);
 cleanup:
 	if (decoded_message) {
 		lasso_release(decoded_message);
