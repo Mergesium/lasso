@@ -288,7 +288,8 @@ lasso_saml20_profile_init_artifact_resolve(LassoProfile *profile,
 	char *artifact_b64 = NULL;
 	xmlChar *provider_succinct_id_b64 = NULL;
 	char *provider_succinct_id[21];
-	char artifact[45];
+	char *artifact = NULL;
+	int artifact_len = 0;
 	LassoSamlp2RequestAbstract *request = NULL;
 	LassoProvider *remote_provider = NULL;
 	int i = 0;
@@ -307,21 +308,17 @@ lasso_saml20_profile_init_artifact_resolve(LassoProfile *profile,
 			return LASSO_PROFILE_ERROR_MISSING_ARTIFACT;
 		}
 	} else if (method == LASSO_HTTP_METHOD_ARTIFACT_POST) {
-		artifact_b64 = g_strdup(msg);
+		lasso_assign_string(artifact_b64, msg);
 	} else {
 		return critical_error(LASSO_PROFILE_ERROR_INVALID_HTTP_METHOD);
 	}
 
-	i = xmlSecBase64Decode((xmlChar*)artifact_b64, (xmlChar*)artifact, 45);
-	if (i < 0 || i > 44) {
-		lasso_release_string(artifact_b64);
-		return LASSO_PROFILE_ERROR_INVALID_ARTIFACT;
-	}
+	goto_cleanup_if_fail_with_rc(lasso_base64_decode(artifact_b64, &artifact, &artifact_len), LASSO_PROFILE_ERROR_INVALID_ARTIFACT);
 
-	if (artifact[0] != 0 || artifact[1] != 4) { /* wrong type code */
-		lasso_release_string(artifact_b64);
-		return LASSO_PROFILE_ERROR_INVALID_ARTIFACT;
-	}
+	goto_cleanup_if_fail_with_rc(artifact_len == 44, LASSO_PROFILE_ERROR_INVALID_ARTIFACT);
+
+	/* wrong type code */
+	goto_cleanup_if_fail_with_rc(artifact[0] == 0 && artifact[1] == 4, LASSO_PROFILE_ERROR_INVALID_ARTIFACT);
 
 	memcpy(provider_succinct_id, artifact+4, 20);
 	provider_succinct_id[20] = 0;
@@ -330,10 +327,7 @@ lasso_saml20_profile_init_artifact_resolve(LassoProfile *profile,
 
 	lasso_assign_new_string(profile->remote_providerID, lasso_server_get_providerID_from_hash(
 			profile->server, (char*)provider_succinct_id_b64));
-	lasso_release_xml_string(provider_succinct_id_b64);
-	if (profile->remote_providerID == NULL) {
-		return LASSO_SERVER_ERROR_PROVIDER_NOT_FOUND;
-	}
+	goto_cleanup_if_fail_with_rc(profile->remote_providerID, LASSO_SERVER_ERROR_PROVIDER_NOT_FOUND);
 
 	/* resolve the resolver url using the endpoint index in the artifact string */
 	remote_provider = lasso_server_get_provider(profile->server, profile->remote_providerID);
@@ -342,15 +336,11 @@ lasso_saml20_profile_init_artifact_resolve(LassoProfile *profile,
 			remote_provider_role,
 			LASSO_SAML2_METADATA_ELEMENT_ARTIFACT_RESOLUTION_SERVICE, NULL, FALSE,
 			FALSE, index_endpoint));
-	if (! profile->msg_url) {
-		debug("looking for index endpoint %d", index_endpoint);
-		return LASSO_PROFILE_ERROR_ENDPOINT_INDEX_NOT_FOUND;
-	}
-
+	goto_cleanup_if_fail_with_rc(profile->msg_url, LASSO_PROFILE_ERROR_ENDPOINT_INDEX_NOT_FOUND);
 
 	lasso_assign_new_gobject(profile->request, lasso_samlp2_artifact_resolve_new());
 	request = LASSO_SAMLP2_REQUEST_ABSTRACT(profile->request);
-	lasso_assign_new_string(LASSO_SAMLP2_ARTIFACT_RESOLVE(request)->Artifact, artifact_b64);
+	lasso_transfer_string(LASSO_SAMLP2_ARTIFACT_RESOLVE(request)->Artifact, artifact_b64);
 	request->ID = lasso_build_unique_id(32);
 	lasso_assign_string(request->Version, "2.0");
 	request->Issuer = LASSO_SAML2_NAME_ID(lasso_saml2_name_id_new_with_string(
@@ -361,6 +351,9 @@ lasso_saml20_profile_init_artifact_resolve(LassoProfile *profile,
 				(LassoNode*)request));
 
 cleanup:
+	lasso_release_string(artifact_b64);
+	lasso_release_string(artifact);
+	lasso_release_xml_string(provider_succinct_id_b64);
 	return rc;
 }
 

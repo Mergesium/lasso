@@ -1403,37 +1403,32 @@ lasso_inflate(unsigned char *input, size_t len, size_t *outlen)
 gboolean
 lasso_node_init_from_deflated_query_part(LassoNode *node, char *deflate_string)
 {
-	int len;
-	size_t outlen = 0;
-	xmlChar *b64_zre, *zre, *re;
-	xmlDoc *doc;
-	xmlNode *root;
+	xmlChar *buffer= NULL;
+	char *decoded = NULL;
+	int decoded_len = 0;
+	xmlChar *re = NULL;
+	size_t re_len = 0;
+	xmlDoc *doc = NULL;
+	xmlNode *root = NULL;
+	gboolean rc = TRUE;
 
-	b64_zre = (xmlChar*)xmlURIUnescapeString(deflate_string, 0, NULL);
-	len = strlen((char*)b64_zre);
-	zre = xmlMalloc(len*4);
-	len = xmlSecBase64Decode(b64_zre, zre, len*4);
-	xmlFree(b64_zre);
-	if (len == -1) {
-		message(G_LOG_LEVEL_CRITICAL, "Failed to base64-decode query");
-		xmlFree(zre);
-		return FALSE;
-	}
+	buffer = (xmlChar*)xmlURIUnescapeString(deflate_string, 0, NULL);
+	goto_cleanup_if_fail_with_rc(lasso_base64_decode((char*)buffer, &decoded, &decoded_len), FALSE);
 
-	re = lasso_inflate(zre, len, &outlen);
-	xmlFree(zre);
+	re = lasso_inflate((unsigned char*)decoded, decoded_len, &re_len);
+	goto_cleanup_if_fail_with_rc_with_warning(re != NULL, FALSE);
 
-	if (! re)
-		return FALSE;
-
-	doc = lasso_xml_parse_memory((char*)re, outlen);
-	lasso_release_string(re);
+	doc = lasso_xml_parse_memory((char*)re, strlen((char*)re));
+	goto_cleanup_if_fail_with_rc_with_warning(doc != NULL, FALSE);
 
 	root = xmlDocGetRootElement(doc);
 	lasso_node_init_from_xml(node, root);
+cleanup:
+	lasso_release_xml_string(buffer);
+	lasso_release_string(decoded);
+	lasso_release_string(re);
 	lasso_release_doc(doc);
-
-	return TRUE;
+	return rc;
 }
 
 char*
@@ -1894,27 +1889,27 @@ lasso_xml_get_soap_content(xmlNode *root)
 LassoMessageFormat
 lasso_xml_parse_message(const char *message, LassoMessageFormat constraint, xmlDoc **doc_out, xmlNode **root_out)
 {
-	char *msg = NULL;
-	gboolean b64 = FALSE;
+	const char *msg = NULL;
+	int msg_len = 0;
+	char *base64_decoded_message = NULL;
 	LassoMessageFormat rc = LASSO_MESSAGE_FORMAT_UNKNOWN;
 	xmlDoc *doc = NULL;
 	xmlNode *root = NULL;
 	gboolean any = constraint == LASSO_MESSAGE_FORMAT_UNKNOWN;
 
-	msg = (char*)message;
-
 	/* BASE64 case */
 	if (any || constraint == LASSO_MESSAGE_FORMAT_BASE64) {
 		if (message[0] != 0 && is_base64(message)) {
-			msg = g_malloc(strlen(message));
-			rc = xmlSecBase64Decode((xmlChar*)message, (xmlChar*)msg, strlen(message));
-			if (rc >= 0) {
-				b64 = TRUE;
-			} else {
-				lasso_release(msg);
-				msg = (char*)message;
+			if (lasso_base64_decode(message, &base64_decoded_message, &msg_len)) {
+				rc = LASSO_MESSAGE_FORMAT_BASE64;
+				msg = base64_decoded_message;
 			}
 		}
+	}
+
+	if (! msg) {
+		msg = message;
+		msg_len = strlen(message);
 	}
 
 	/* XML case */
@@ -1922,12 +1917,16 @@ lasso_xml_parse_message(const char *message, LassoMessageFormat constraint, xmlD
 		constraint == LASSO_MESSAGE_FORMAT_XML ||
 		constraint == LASSO_MESSAGE_FORMAT_SOAP) {
 		if (strchr(msg, '<')) {
-			doc = lasso_xml_parse_memory(msg, strlen(msg));
+			doc = lasso_xml_parse_memory(msg, msg_len);
 			if (doc == NULL) {
 				rc = LASSO_MESSAGE_FORMAT_UNKNOWN;
 				goto cleanup;
 			}
 			root = xmlDocGetRootElement(doc);
+			if (! root) {
+				rc = LASSO_MESSAGE_FORMAT_ERROR;
+				goto cleanup;
+			}
 
 			if (any || constraint == LASSO_MESSAGE_FORMAT_SOAP) {
 				gboolean is_soap = FALSE;
@@ -1936,26 +1935,20 @@ lasso_xml_parse_message(const char *message, LassoMessageFormat constraint, xmlD
 				if (is_soap) {
 					root = lasso_xml_get_soap_content(root);
 				}
-				if (! root) {
-					rc = LASSO_MESSAGE_FORMAT_ERROR;
-					goto cleanup;
-				}
 				if (is_soap) {
 					rc = LASSO_MESSAGE_FORMAT_SOAP;
 					goto cleanup;
 				}
-				if (b64) {
-					lasso_release(msg);
-					rc = LASSO_MESSAGE_FORMAT_BASE64;
+				if (rc == LASSO_MESSAGE_FORMAT_BASE64) {
 					goto cleanup;
 				}
 				rc = LASSO_MESSAGE_FORMAT_XML;
-				goto cleanup;
 			}
 		}
 	}
 
 cleanup:
+	lasso_release(base64_decoded_message);
 	if (doc_out) {
 		*doc_out = doc;
 		if (root_out) {
@@ -1963,7 +1956,6 @@ cleanup:
 		}
 	} else {
 		lasso_release_doc(doc);
-		lasso_release_xml_node(root);
 	}
 	return rc;
 }
@@ -2667,36 +2659,30 @@ lasso_xmlsec_load_private_key(const char *filename_or_buffer, const char *passwo
 
 gboolean
 lasso_get_base64_content(xmlNode *node, char **content, size_t *length) {
-	xmlChar *base64, *stripped_base64;
-	xmlChar *result;
-	int base64_length;
-	int rc = 0;
+	xmlChar *base64 = NULL;
+	xmlChar *stripped_base64 = NULL;
+	char *decoded = NULL;
+	int decoded_length = 0;
+	int rc = TRUE;
 
-	if (! node || ! content || ! length)
-		return FALSE;
+	goto_cleanup_if_fail_with_rc(node && content && length, FALSE);
 
 	base64 = xmlNodeGetContent(node);
-	if (! base64)
-		return FALSE;
-	stripped_base64 = base64;
+	goto_cleanup_if_fail_with_rc(base64, FALSE);
+
 	/* skip spaces */
+	stripped_base64 = base64;
 	while (*stripped_base64 && isspace(*stripped_base64))
 		stripped_base64++;
 
-	base64_length = strlen((char*)stripped_base64);
-	result = g_new(xmlChar, base64_length);
-	xmlSecErrorsDefaultCallbackEnableOutput(FALSE);
-	rc = xmlSecBase64Decode(stripped_base64, result, base64_length);
-	xmlSecErrorsDefaultCallbackEnableOutput(TRUE);
-	xmlFree(base64);
-	if (rc < 0) {
-		return FALSE;
-	} else {
-		*content = (char*)g_memdup(result, rc);
-		xmlFree(result);
-		*length = rc;
-		return TRUE;
-	}
+	goto_cleanup_if_fail_with_rc(lasso_base64_decode((char*)stripped_base64, &decoded, &decoded_length), FALSE);
+	lasso_transfer_string(*content, decoded);
+	*length = decoded_length;
+cleanup:
+	lasso_release_xml_string(base64);
+	lasso_release_string(decoded);
+	return rc;
+
 }
 
 xmlSecKeyPtr
@@ -3193,14 +3179,13 @@ static char*
 lasso_get_saml_message(xmlChar **query_fields) {
 	int i = 0;
 	char *enc = NULL;
-	char *message = NULL;
+	char *raw_message = NULL;
+	char *gziped_message = NULL;
+	int gziped_message_len = 0;
 	char *saml_message = NULL;
-	char *decoded_message = NULL;
+	size_t saml_message_len = 0;
 	xmlChar *field = NULL;
 	char *t = NULL;
-	int rc = 0;
-	int len = 0;
-	size_t outlen = 0;
 
 	for (i=0; (field=query_fields[i]); i++) {
 		t = strchr((char*)field, '=');
@@ -3212,11 +3197,11 @@ lasso_get_saml_message(xmlChar **query_fields) {
 			continue;
 		}
 		if (strcmp((char*)field, LASSO_SAML2_FIELD_REQUEST) == 0 || strcmp((char*)field, LASSO_SAML2_FIELD_RESPONSE) == 0) {
-			message = t+1;
+			raw_message = t+1;
 			continue;
 		}
 	}
-	if (message == NULL) {
+	if (raw_message == NULL) {
 		return NULL;
 	}
 	if (enc && strcmp(enc, LASSO_SAML2_DEFLATE_ENCODING) != 0) {
@@ -3224,23 +3209,12 @@ lasso_get_saml_message(xmlChar **query_fields) {
 		debug("Unknown URL encoding: %64s", enc);
 		return NULL;
 	}
-	len = strlen(message);
-	decoded_message = g_malloc(len);
-	if (! is_base64(message)) {
-		debug("message is not base64");
-		goto cleanup;
-	}
-	rc = xmlSecBase64Decode((xmlChar*)message, (xmlChar*)decoded_message, len);
-	if (rc < 0) {
-		debug("could not decode redirect SAML message");
-		goto cleanup;
-	}
-	/* rc contains the length of the result */
-	saml_message = (char*)lasso_inflate((unsigned char*) decoded_message, rc, &outlen);
+
+	goto_cleanup_if_fail(lasso_base64_decode(raw_message, &gziped_message, &gziped_message_len))
+	saml_message = (char*)lasso_inflate((unsigned char*)gziped_message, gziped_message_len, &saml_message_len);
 cleanup:
-	if (decoded_message) {
-		lasso_release(decoded_message);
-	}
+	lasso_release_string(gziped_message);
+
 	return saml_message;
 }
 
@@ -3256,6 +3230,7 @@ lasso_xmltextreader_from_message(const char *message, char **to_free) {
 	char *needle;
 	xmlChar **query_fields = NULL;
 	char *decoded_message = NULL;
+	int decoded_message_len = 0;
 	xmlTextReader *reader = NULL;
 
 	g_assert(to_free);
@@ -3271,22 +3246,17 @@ lasso_xmltextreader_from_message(const char *message, char **to_free) {
 			}
 			len = strlen(message);
 		} else { /* POST */
-			int rc = 0;
-
 			if (! is_base64(message)) {
 				debug("POST message is not base64");
 				goto cleanup;
 			}
-			decoded_message = g_malloc(len);
-			rc = xmlSecBase64Decode((xmlChar*)message, (xmlChar*)decoded_message, len);
-			if (rc < 0) {
+			if (! lasso_base64_decode(message, &decoded_message, &decoded_message_len)) {
 				debug("could not decode POST SAML message");
 				goto cleanup;
 			}
-			len = rc;
-			decoded_message[len] = '\0';
-			message = *to_free = decoded_message;
-			decoded_message = NULL;
+			message = decoded_message;
+			len = decoded_message_len;
+			lasso_transfer_string(*to_free, decoded_message);
 		}
 	}
 
@@ -3294,9 +3264,7 @@ lasso_xmltextreader_from_message(const char *message, char **to_free) {
 		reader = xmlReaderForMemory(message, len, "", NULL, XML_PARSE_NONET);
 
 cleanup:
-	if (query_fields)
-		lasso_release_array_of_xml_strings(query_fields);
-	if (decoded_message)
-		lasso_release_string(decoded_message);
+	lasso_release_array_of_xml_strings(query_fields);
+	lasso_release_string(decoded_message);
 	return reader;
 }

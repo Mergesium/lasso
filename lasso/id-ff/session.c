@@ -797,25 +797,22 @@ get_xmlNode(LassoNode *node, G_GNUC_UNUSED gboolean lasso_dump)
 
 xmlNode*
 base64_to_xmlNode(xmlChar *buffer) {
-	xmlChar *decoded = NULL;
+	char *decoded = NULL;
+	int decoded_len = 0;
 	xmlDoc *doc = NULL;
 	xmlNode *ret = NULL;
-	int l1,l2;
 
-	l1 = 4*strlen((char*)buffer)+2;
-	decoded = g_malloc(l1);
-	l2 = xmlSecBase64Decode(buffer, decoded, l1);
-	if (l2 < 0)
+	if (! lasso_base64_decode((char*)buffer, &decoded, &decoded_len))
 		goto cleanup;
-	doc = xmlParseMemory((char*)decoded, l2);
+	doc = xmlParseMemory(decoded, decoded_len);
 	if (doc == NULL)
 		goto cleanup;
 	ret = xmlDocGetRootElement(doc);
 	if (ret) {
-	ret = xmlCopyNode(ret, 1);
+		ret = xmlCopyNode(ret, 1);
 	}
 cleanup:
-	lasso_release(decoded);
+	lasso_release_string(decoded);
 	lasso_release_doc(doc);
 
 	return ret;

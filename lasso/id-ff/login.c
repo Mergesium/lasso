@@ -1652,7 +1652,8 @@ lasso_login_init_request(LassoLogin *login, gchar *response_msg,
 	int i;
 	char *artifact_b64 = NULL, *provider_succinct_id_b64;
 	char provider_succinct_id[21];
-	char artifact[43];
+	char *artifact = NULL;
+	int artifact_len = 0;
 	LassoSamlpRequestAbstract *request;
 	LassoProfile *profile;
 
@@ -1689,18 +1690,23 @@ lasso_login_init_request(LassoLogin *login, gchar *response_msg,
 		lasso_assign_string(artifact_b64, response_msg);
 	}
 
-	i = xmlSecBase64Decode((xmlChar*)artifact_b64, (xmlChar*)artifact, 43);
-	if (i < 0 || i > 42) {
+	if (! lasso_base64_decode(artifact_b64, &artifact, &artifact_len)) {
+		return LASSO_PROFILE_ERROR_INVALID_ARTIFACT;
+	}
+	if (artifact_len != 42) {
 		lasso_release_string(artifact_b64);
+		lasso_release_string(artifact);
 		return LASSO_PROFILE_ERROR_INVALID_ARTIFACT;
 	}
 
 	if (artifact[0] != 0 || artifact[1] != 3) { /* wrong type code */
 		lasso_release_string(artifact_b64);
+		lasso_release_string(artifact);
 		return LASSO_PROFILE_ERROR_INVALID_ARTIFACT;
 	}
 
 	memcpy(provider_succinct_id, artifact+2, 20);
+	lasso_release_string(artifact);
 	provider_succinct_id[20] = 0;
 
 	provider_succinct_id_b64 = (char*)xmlSecBase64Encode((xmlChar*)provider_succinct_id, 20, 0);

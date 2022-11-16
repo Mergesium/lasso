@@ -2534,7 +2534,9 @@ is_base64(const char *message)
 LassoMessageFormat
 lasso_node_init_from_message_with_format(LassoNode *node, const char *message, LassoMessageFormat constraint, xmlDoc **doc_out, xmlNode **root_out)
 {
-	char *msg = NULL;
+	char *decoded_msg = NULL;
+	int decoded_msg_len = 0;
+	const char *msg = NULL;
 	gboolean b64 = FALSE;
 	LassoMessageFormat rc = LASSO_MESSAGE_FORMAT_ERROR;
 	xmlDoc *doc = NULL;
@@ -2546,15 +2548,11 @@ lasso_node_init_from_message_with_format(LassoNode *node, const char *message, L
 	/* BASE64 case */
 	if (any || constraint == LASSO_MESSAGE_FORMAT_BASE64) {
 		if (message[0] != 0 && is_base64(message)) {
-			int rc = 0;
-
-			msg = g_malloc(strlen(message));
-			rc = xmlSecBase64Decode((xmlChar*)message, (xmlChar*)msg, strlen(message));
-			if (rc >= 0) {
+			if (lasso_base64_decode(message, &decoded_msg, &decoded_msg_len)) {
 				b64 = TRUE;
+				msg = decoded_msg;
 			} else {
-				lasso_release(msg);
-				msg = (char*)message;
+				msg = message;
 			}
 		}
 	}
@@ -2589,7 +2587,6 @@ lasso_node_init_from_message_with_format(LassoNode *node, const char *message, L
 					goto cleanup;
 				}
 				if (b64) {
-					lasso_release(msg);
 					rc = LASSO_MESSAGE_FORMAT_BASE64;
 					goto cleanup;
 				}
@@ -2612,6 +2609,7 @@ lasso_node_init_from_message_with_format(LassoNode *node, const char *message, L
 	}
 
 cleanup:
+	lasso_release_string(decoded_msg);
 	if (doc_out) {
 		*doc_out = doc;
 		if (root_out) {

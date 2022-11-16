@@ -1434,12 +1434,12 @@ lasso_provider_verify_signature(LassoProvider *provider,
 
 	if (format == LASSO_MESSAGE_FORMAT_BASE64) {
 		int len;
-		char *msg = g_malloc(strlen(message));
-		len = xmlSecBase64Decode((xmlChar*)message, (xmlChar*)msg, strlen(message));
-		if (len < 0) {
+		char *msg = NULL;
+
+		if (! lasso_base64_decode(message, &msg, &len)) {
 			goto_cleanup_with_rc(LASSO_PROFILE_ERROR_INVALID_MSG);
 		}
-		doc = lasso_xml_parse_memory(msg, strlen(msg));
+		doc = lasso_xml_parse_memory(msg, len);
 		lasso_release_string(msg);
 	} else {
 		doc = lasso_xml_parse_memory(message, strlen(message));
