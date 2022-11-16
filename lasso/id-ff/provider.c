@@ -1592,7 +1592,7 @@ lasso_provider_get_key_encryption_method(const LassoProvider *provider)
 int
 lasso_provider_verify_query_signature(LassoProvider *provider, const char *message)
 {
-	int (*check)(const char *, const xmlSecKey *) = NULL;
+	int (*check)(const char *, xmlSecKey *) = NULL;
 	int rc = 0;
 	int signature_rc = 0;
 	GList *public_keys = NULL;

@@ -218,9 +218,9 @@ xmlSecKeysMngr* lasso_load_certs_from_pem_certs_chain_file (const char *file);
 
 char* lasso_query_sign(char *query, LassoSignatureContext signature_context);
 
-int lasso_query_verify_signature(const char *query, const xmlSecKey *public_key);
+int lasso_query_verify_signature(const char *query, xmlSecKey *public_key);
 
-int lasso_saml2_query_verify_signature(const char *query, const xmlSecKey *sender_public_key);
+int lasso_saml2_query_verify_signature(const char *query, xmlSecKey *sender_public_key);
 
 char* lasso_sha1(const char *str);
 
