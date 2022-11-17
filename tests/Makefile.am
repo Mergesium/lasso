@@ -3,6 +3,8 @@ MAINTAINERCLEANFILES = Makefile.in
 if WITH_TESTS
 
 TESTS = tests tests2
+TESTS_ENVIRONMENT = \
+	SSL_CERT_FILE=/tmp/coin
 noinst_PROGRAMS = tests perfs tests2
 
 
