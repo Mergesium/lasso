@@ -1484,11 +1484,6 @@ lasso_saml20_login_process_response_status_and_assertion(LassoLogin *login)
 		last_assertion = assertion;
 	lasso_foreach_full_end();
 
-	/* set the profile signature status only after all the signatures are
-	 * verified.
-	 */
-	profile->signature_status = rc;
-
 	/* set the default assertion to the last one */
 	if (last_assertion) {
 		lasso_assign_gobject (login->private_data->saml2_assertion, last_assertion);
