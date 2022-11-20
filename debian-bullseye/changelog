@@ -1,3 +1,32 @@
+lasso (2.8.0-3) unstable; urgency=medium
+
+  * d/changelog: fix typo in old changelog entry (s/uptream/upstream/).
+  * d/liblasso3.symbols: strip debian revision from lasso_log symbol.
+  * d/control, d/rules: run make check to catch some errors early.
+    (closes: 809762) (adapted from patch by Corey Bryant, thanks).
+
+ -- Frederic Peters <fpeters@debian.org>  Thu, 17 Nov 2022 09:29:59 +0100
+
+lasso (2.8.0-2) unstable; urgency=medium
+
+  * debian/patches/use-openssl-evp-api.diff: import upstream WIP patch for
+    compatibility with latest xmlsec (closes: 1024138)
+
+ -- Frederic Peters <fpeters@debian.org>  Wed, 16 Nov 2022 19:12:02 +0100
+
+lasso (2.8.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/liblasso3.symbols: add declaration for new symbols:
+    * lasso_get_default_key_encryption_method
+    * lasso_get_default_signature_method
+    * lasso_parse_key_encryption_method
+    * lasso_provider_get_key_encryption_method
+    * lasso_provider_set_key_encryption_method
+    * lasso_set_default_key_encryption_method
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 15 Mar 2022 16:07:45 +0100
+
 lasso (2.7.0-3) unstable; urgency=medium
 
   * d/control, d/compat: switch to debhelper-compat, remove compat file.

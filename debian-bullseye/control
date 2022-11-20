@@ -4,6 +4,7 @@ Section: libs
 Maintainer: Frederic Peters <fpeters@debian.org>
 Build-Depends: debhelper-compat (= 12),
         dh-python,
+        liberror-perl,
         gtk-doc-tools,
         libxml2-dev,
         libxslt1-dev,
