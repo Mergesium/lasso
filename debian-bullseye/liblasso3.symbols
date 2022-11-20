@@ -67,6 +67,8 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_flag_strict_checking@Base 2.3.5
  lasso_flag_thin_sessions@Base 2.5.0
  lasso_flag_verify_signature@Base 2.3.5
+ lasso_get_default_key_encryption_method@Base 2.8.0
+ lasso_get_default_signature_method@Base 2.8.0
  lasso_get_prefix_for_dst_service_href@Base 2.3.5
  lasso_get_prefix_for_idwsf2_dst_service_href@Base 2.3.5
  lasso_identity_destroy@Base 2.3.5
@@ -149,7 +151,7 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_lib_status_response_new@Base 2.3.5
  lasso_lib_subject_get_type@Base 2.3.5
  lasso_lib_subject_new@Base 2.3.5
- lasso_log@Base 2.7.0-2
+ lasso_log@Base 2.7.0
  lasso_log_remove_handler@Base 2.3.5
  lasso_log_set_handler@Base 2.3.5
  lasso_login_accept_sso@Base 2.3.5
@@ -261,6 +263,7 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_paos_response_get_type@Base 2.5.0
  lasso_paos_response_new@Base 2.5.0
  lasso_paos_response_validate@Base 2.5.0
+ lasso_parse_key_encryption_method@Base 2.8.0
  lasso_profile_get_artifact@Base 2.3.5
  lasso_profile_get_artifact_message@Base 2.3.5
  lasso_profile_get_identity@Base 2.3.5
@@ -298,6 +301,7 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_provider_get_encryption_mode@Base 2.3.5
  lasso_provider_get_first_http_method@Base 2.3.5
  lasso_provider_get_idp_supported_attributes@Base 2.3.5
+ lasso_provider_get_key_encryption_method@Base 2.8.0
  lasso_provider_get_metadata_keys_for_role@Base 2.3.5
  lasso_provider_get_metadata_list@Base 2.3.5
  lasso_provider_get_metadata_list_for_role@Base 2.3.5
@@ -317,6 +321,7 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_provider_saml2_node_encrypt@Base 2.3.5
  lasso_provider_set_encryption_mode@Base 2.3.5
  lasso_provider_set_encryption_sym_key_type@Base 2.3.5
+ lasso_provider_set_key_encryption_method@Base 2.8.0
  lasso_provider_set_protocol_conformance@Base 2.5.0
  lasso_provider_set_server_signing_key@Base 2.5.0
  lasso_provider_verify_signature@Base 2.5.0
@@ -544,6 +549,7 @@ liblasso.so.3 liblasso3 #MINVER#
  lasso_session_new@Base 2.3.5
  lasso_session_new_from_dump@Base 2.3.5
  lasso_session_remove_assertion@Base 2.3.5
+ lasso_set_default_key_encryption_method@Base 2.8.0
  lasso_set_flag@Base 2.3.5
  lasso_shutdown@Base 2.3.5
  lasso_soap_body_get_type@Base 2.3.5

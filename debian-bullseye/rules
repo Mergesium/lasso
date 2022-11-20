@@ -64,6 +64,9 @@ build-stamp: config.status
 	  $(MAKE) PYTHON=/usr/bin/python$$v -C bindings/python$$v; \
 	done
 
+	# Run tests
+	$(MAKE) check
+
 	touch build-stamp
 
 clean:
