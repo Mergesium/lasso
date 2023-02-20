@@ -20,7 +20,19 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye lasso'
+                    env.SHORT_JOB_NAME=sh(
+                        returnStdout: true,
+                        // given JOB_NAME=gitea/project/PR-46, returns project
+                        // given JOB_NAME=project/main, returns project
+                        script: '''
+                            echo "${JOB_NAME}" | sed "s/gitea\\///" | awk -F/ '{print $1}'
+                        '''
+                    ).trim()
+                    if (env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'origin/main') {
+                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye ${SHORT_JOB_NAME}"
+                    } else if (env.GIT_BRANCH.startsWith('hotfix/')) {
+                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye --branch ${env.GIT_BRANCH} --hotfix ${SHORT_JOB_NAME}"
+                    }
                 }
             }
         }
