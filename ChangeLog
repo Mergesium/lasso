@@ -1,3 +1,14 @@
+2023-03-14  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Release 2.8.2 (#74996)
+	- Compatibility with EVP API of openssl 1.x, thanks to Maxime Besson
+	  from Worteks.
+
+2023-03-06  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
+
+	Compatibility with EVP API of openssl 1.x (#74996)
+	Thanks to Maxime Besson from Worteks.
+
 2023-02-28  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
 
 	Release 2.8.1
@@ -9,6 +20,18 @@
 	-·Replace·use·of·deprecated·xmlSecBase64Decode·by·xmlSecBase64Decode_ex¶
 	-·Fix·overwrite·of·profile.signature_status·in·lasso_saml20_login_process_response_status_and_assertion¶
 	-·Fix·lot·of·GCC·warnings¶
+
+2023-02-20  Agate  <me@agate.blue>
+
+	Prepare Jenkinsfile for Gitea migration (#74572)
+
+2023-02-09  Frédéric Péters  <fpeters@entrouvert.com>
+
+	debian: introduce autopkgtests (#74360)
+
+2022-12-22  Frédéric Péters  <fpeters@entrouvert.com>
+
+	ci: only build package for bullseye (#72729)
 
 2022-11-23  Benjamin Dauvergne  <bdauvergne@entrouvert.com>
 

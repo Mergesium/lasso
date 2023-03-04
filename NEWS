@@ -1,6 +1,12 @@
 NEWS
 ====
 
+2.8.2 - March 14th 2023
+-----------------------
+
+- Compatibility with EVP API of openssl 1.x, thanks to Maxime Besson from
+  Worteks.
+
 2.8.1 - February 28th 2023
 --------------------------
 

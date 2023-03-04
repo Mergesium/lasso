@@ -56,6 +56,10 @@
     </repository>
     <release>
       <Version>
+        <created>2023-03-14</created>
+        <revision>2.8.2</revision>
+      </Version>
+      <Version>
         <created>2023-02-28</created>
         <revision>2.8.1</revision>
       </Version>
