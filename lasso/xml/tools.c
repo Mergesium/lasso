@@ -619,13 +619,17 @@ lasso_query_sign(char *query, LassoSignatureContext context)
 				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignInit failed");
 				goto done;
 			}
-			if (EVP_DigestSign(evp_md_ctx, NULL, &siglen, (unsigned char*)new_query, strlen(new_query)) <= 0) {
-				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSign failed");
+			if (EVP_DigestSignUpdate( evp_md_ctx, new_query, strlen(new_query)) <= 0) {
+				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignUpdate failed");
+				goto done;
+			}
+			if (EVP_DigestSignFinal(evp_md_ctx, NULL, &siglen) <= 0) {
+				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignFinal failed");
 				goto done;
 			}
 			sigret = g_malloc(siglen);
-			if (EVP_DigestSign(evp_md_ctx, sigret, &siglen, (unsigned char*)new_query, strlen(new_query)) <= 0) {
-				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSign failed");
+			if (EVP_DigestSignFinal(evp_md_ctx, sigret, &siglen) <= 0) {
+				message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignFinal failed");
 				goto done;
 			}
 			status = 1;
@@ -671,7 +675,7 @@ done:
 	lasso_release_xml_string(b64_sigret);
 	lasso_release_xml_string(e_b64_sigret);
 	if (evp_md_ctx) {
-		EVP_MD_CTX_free(evp_md_ctx);
+		EVP_MD_CTX_destroy(evp_md_ctx);
 		evp_md_ctx = NULL;
 	}
 	if (hmac_pkey) {
@@ -845,16 +849,20 @@ lasso_query_verify_helper(const char *signed_content, const char *b64_signature,
 					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignInit failed");
 					goto_cleanup_with_rc(LASSO_DS_ERROR_INVALID_SIGNATURE);
 				}
-				if (EVP_DigestSign(evp_md_ctx, NULL, &new_signature_len, (unsigned char*)signed_content, strlen(signed_content)) != 1) {
-					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSign failed");
+				if (EVP_DigestSignUpdate(evp_md_ctx, signed_content, strlen(signed_content)) != 1) {
+					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignUpdate failed");
+					goto_cleanup_with_rc(LASSO_DS_ERROR_INVALID_SIGNATURE);
+				}
+				if (EVP_DigestSignFinal(evp_md_ctx, NULL, &new_signature_len) != 1) {
+					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignFinal failed");
 					goto_cleanup_with_rc(LASSO_DS_ERROR_INVALID_SIGNATURE);
 				}
 				if (new_signature_len != signature_len) {
 					goto_cleanup_with_rc(LASSO_DS_ERROR_INVALID_SIGNATURE);
 				}
 				new_signature = g_malloc(new_signature_len);
-				if (EVP_DigestSign(evp_md_ctx, new_signature, &new_signature_len, (unsigned char*)signed_content, strlen(signed_content)) != 1) {
-					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSign failed");
+				if (EVP_DigestSignFinal(evp_md_ctx, new_signature, &new_signature_len) != 1) {
+					message(G_LOG_LEVEL_CRITICAL, "EVP_DigestSignFinal failed");
 					goto_cleanup_with_rc(LASSO_DS_ERROR_INVALID_SIGNATURE);
 				}
 				if (CRYPTO_memcmp(signature, new_signature, signature_len) != 0) {
@@ -870,7 +878,7 @@ cleanup:
 	lasso_release_string(digest);
 	lasso_release_string(new_signature);
 	if (evp_md_ctx) {
-		EVP_MD_CTX_free(evp_md_ctx);
+		EVP_MD_CTX_destroy(evp_md_ctx);
 		evp_md_ctx = NULL;
 	}
 	if (hmac_pkey) {
