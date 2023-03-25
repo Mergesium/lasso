@@ -18,7 +18,7 @@
 
 
   <p>
-		<a href="https://code.google.com/p/modmellon/">mod_mellon!</a> is
+	  <a href="https://github.com/latchset/mod_auth_mellon">mod_auth_mellon</a> is
    a free (GPL) SAML 2.0 authentication module for Apache 2.
   </p>
 
