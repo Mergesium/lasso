@@ -1,10 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import xml.dom.minidom
 import os
 import stat
 import re
-from six import StringIO
+from io import StringIO
 import sys
 
 import ezt
@@ -318,4 +318,3 @@ for base, dirs, files in os.walk('web'):
             with open(dst_file, 'w')as f:
                 f.write(fd.getvalue())
             continue
-
