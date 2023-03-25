@@ -21,23 +21,15 @@
 	</p>
 	 
 	<p>
-		Additionnaly there are <i>stretch</i> and <i>jessie</i> packages and there may be more
-	  up-to-date packages available in our local apt repository.  Pick the
-	  one appropriate for your distribution:
+	  Additionnaly there are <i>bullseye</i> packages and there may be more
+	  up-to-date packages available in our local apt repository.
 	</p>
 
-	<h3>Stretch</h3>
-	<pre>
-	deb http://deb.entrouvert.org stretch main
-	</pre>
-
-	<h3>Jessie</h3>
-	<pre>
-	deb http://deb.entrouvert.org jessie main
-	</pre>
+	<h3>Bullseye</h3>
+	<pre>deb https://deb.entrouvert.org/debian/ bullseye main</pre>
 
 
-	<p>Look on <a href="http://deb.entrouvert.org">deb.entrouvert.org</a> to get the GPG key of our repository</p>
+	<p>Look on <a href="https://deb.entrouvert.org">deb.entrouvert.org</a> to get the GPG key of our repository</p>
 
 	<p>
 	  Available packages are&nbsp;:
@@ -46,9 +38,7 @@
 	<ul>
 	 <li>liblasso3: runtime library</li>
 	 <li>liblasso3-dev: C development kit</li>
-	 <li>python-lasso: Python 2.5 &amp; 2.6 bindings</li>
-	 <li>php5-lasso: PHP bindings</li>
-	 <li>liblasso-java: JAVA bindings</li>
+	 <li>python3-lasso: Python 3 bindings</li>
 	 <li>liblasso-perl: Perl bindings</li>
 	</ul>
 
