@@ -7,7 +7,7 @@
   xml:lang="en">
     <name>Lasso</name>
     <shortname>lasso</shortname>
-    <homepage rdf:resource="http://lasso.entrouvert.org"/>
+    <homepage rdf:resource="https://lasso.entrouvert.org"/>
     <created>2003-07-01</created>
     <description>
       Lasso (Liberty Alliance Single Sign On) is a free (GNU GPL) implementation
@@ -18,14 +18,14 @@
     </description>
     <shortdesc>Free Software implementation of Liberty Alliance specifications</shortdesc>
     <bug-database rdf:resource="https://dev.entrouvert.org//projects/lasso"/>
-    <mailing-list rdf:resource="http://listes.entrouvert.com/wwsympa.fcgi/info/lasso"/>
+    <mailing-list rdf:resource="https://listes.entrouvert.com/info/lasso"/>
     <programming-language>C</programming-language>
     <programming-language>Python</programming-language>
     <programming-language>Java</programming-language>
     <programming-language>PHP</programming-language>
     <programming-language>Perl</programming-language>
     <license rdf:resource="http://usefulinc.com/doap/licenses/gpl"/>
-    <download-page rdf:resource="http://lasso.entrouvert.org/download/"/>
+    <download-page rdf:resource="https://lasso.entrouvert.org/download/"/>
     <implements>
       <Specification rdf:about="http://www.projectliberty.org/liberty/content/download/1266/8160/file/liberty-idff-1.2-20050520.zip">
         <rdfs:label>Liberty Alliance ID-FF 1.2</rdfs:label>
