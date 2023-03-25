@@ -47,9 +47,9 @@
 
 	<p>To checkout the repository do&nbsp;:</p>
 
-	<pre>git clone https://repos.entrouvert.org/lasso.git</pre>
+	<pre>git clone https://git.entrouvert.org/entrouvert/lasso.gitt</pre>
 
-	<p>You can also <a href="https://repos.entrouvert.org/lasso.git/">browse</a> using CGit.</p>
+	<p>You can also <a href="https://git.entrouvert.org/entrouvert/lasso.git">browse</a> using CGit.</p>
 
  </body>
 </html>

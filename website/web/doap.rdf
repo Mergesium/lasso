@@ -50,8 +50,8 @@
     </developer>
     <repository>
       <GITRepository>
-        <location rdf:resource="http://git.entrouvert.org/lasso.git/"/>
-        <browse rdf:resource="http://git.entrouvert.org/lasso.git/"/>
+        <location rdf:resource="https://git.entrouvert.org/entrouvert/lasso.git"/>
+        <browse rdf:resource="https://git.entrouvert.org/entrouvert/lasso.git"/>
       </GITRepository>
     </repository>
     <release>
