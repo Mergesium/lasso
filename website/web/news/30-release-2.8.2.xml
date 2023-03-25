@@ -9,7 +9,7 @@
 
  <p class="changes">
   <strong>What changed ?</strong>
-  A lot, so look at the <a href="https://git.entrouvert.org/entrouvert/lasso/src/tag/v2.8.2/NEWS#L4">NEWS</a> file.
+  Compatibility with EVP API of openssl 1.x was restored.
  </p>
 
 </div>
