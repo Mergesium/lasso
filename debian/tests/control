@@ -1,0 +1,3 @@
+Test-Command: for py in $(py3versions -s); do echo "[*] testing on $py:"; $py debian/tests/sso.py ; done
+
+Test-Command: /usr/bin/perl bindings/perl/test.pl
