@@ -29,9 +29,9 @@ pipeline {
                         '''
                     ).trim()
                     if (env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'origin/main') {
-                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye ${SHORT_JOB_NAME}"
+                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye,bookworm ${SHORT_JOB_NAME}"
                     } else if (env.GIT_BRANCH.startsWith('hotfix/')) {
-                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye --branch ${env.GIT_BRANCH} --hotfix ${SHORT_JOB_NAME}"
+                        sh "sudo -H -u eobuilder /usr/local/bin/eobuilder -d bullseye,bookworm --branch ${env.GIT_BRANCH} --hotfix ${SHORT_JOB_NAME}"
                     }
                 }
             }
