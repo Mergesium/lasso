@@ -1,3 +1,9 @@
+lasso (2.8.1-2) unstable; urgency=medium
+
+  * debian/control: add build-dependency on python3-all (closes: 1056418)
+
+ -- Frederic Peters <fpeters@debian.org>  Wed, 22 Nov 2023 13:09:36 +0100
+
 lasso (2.8.1-1) unstable; urgency=medium
 
   * New upstream bugfix release.
