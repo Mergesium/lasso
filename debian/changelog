@@ -1,3 +1,10 @@
+lasso (2.8.1-3) unstable; urgency=medium
+
+  * debian/tests/control: add missing depends: python3-all to python
+    autopkgtests (closes: 1059641)
+
+ -- Frederic Peters <fpeters@debian.org>  Fri, 29 Dec 2023 20:07:18 +0100
+
 lasso (2.8.1-2) unstable; urgency=medium
 
   * debian/control: add build-dependency on python3-all (closes: 1056418)
