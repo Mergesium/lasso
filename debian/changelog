@@ -1,3 +1,9 @@
+lasso (2.8.2-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- Frederic Peters <fpeters@debian.org>  Sat, 30 Dec 2023 10:18:40 +0100
+
 lasso (2.8.1-4) unstable; urgency=medium
 
   * debian/tests/control: add missing/explicit python3-lasso to python
