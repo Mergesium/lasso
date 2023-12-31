@@ -1,4 +1,4 @@
 Test-Command: for py in $(py3versions -s); do echo "[*] testing on $py:"; $py debian/tests/sso.py ; done
-Depends: python3-all
+Depends: python3-lasso, python3-all
 
 Test-Command: /usr/bin/perl bindings/perl/test.pl
